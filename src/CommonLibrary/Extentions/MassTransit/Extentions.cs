@@ -4,9 +4,9 @@ using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CommonLibrary.MassTransit;
+namespace CommonLibrary.Extentions.MassTransit;
 
-public static class Extentions
+public static class MassTransitExtention
 {
     public static IServiceCollection AddMassTransitWithRabbitMq(this IServiceCollection services)
     {

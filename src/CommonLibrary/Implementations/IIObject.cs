@@ -1,6 +1,6 @@
 ﻿using CommonLibrary.Entities.InternalService;
 
-namespace CommonLibrary.Implementations.InternalService;
+namespace CommonLibrary.Implementations;
 
 public class IIObject: IObject
 {
