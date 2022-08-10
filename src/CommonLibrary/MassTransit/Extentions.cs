@@ -23,7 +23,7 @@ public static class Extentions
                     new KebabCaseEndpointNameFormatter(serviceSettings.ServiceName, false));
                 configurator.UseMessageRetry(retryConfigurator =>
                 {
-                    retryConfigurator.Interval(6, TimeSpan.FromSeconds(2));
+                    retryConfigurator.Interval(10, TimeSpan.FromSeconds(3));
                 });
             });
         });
