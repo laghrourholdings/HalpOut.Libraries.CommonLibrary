@@ -4,14 +4,15 @@ using CommonLibrary.Interfaces;
 
 namespace CommonLibrary.Implementations;
 
-public class ObjectServiceBusResponse<TOldSubject,TNewSubject>
-    : IObjectServiceBusResponse<TOldSubject, TNewSubject> where TNewSubject : IObject 
+public class ObjectServiceBusResponse
+    : IObjectServiceBusResponse<IObject>
 {
-    public string Contract { get; set; }
-    public TNewSubject Subject { get; set; }
     public string Descriptor { get; set; }
+    public string Contract { get; set; }
     public string? Data { get; set; }
     public Guid? LogHandleId { get; set; }
-    public IServiceBusRequest<TOldSubject> InitialRequest { get; set; }
+    public IObject? Subject { get; set; }
+    public IEnumerable<IObject>? Subjects { get; set; }
+    public IServiceBusMessage InitialRequest { get; set; }
     public HttpStatusCode StatusCode { get; set; }
 }
