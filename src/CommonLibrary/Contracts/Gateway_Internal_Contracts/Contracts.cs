@@ -11,9 +11,6 @@ public record GetAllObjects(IServiceBusRequest<IEmpty> Payload);
 
 
 //Internal to Gateway
-public record CreateObjectResponse(
-    IObjectServiceBusResponse<Guid,IObject> Payload);
-public record RegisterObjectResponse(IServiceBusResponse<IObject, Guid> Payload);
-public record GetAllObjectResponse(IServiceBusResponse<IEmpty,IEnumerable<IObject>> Payload);
-// public record CatalogItemUpdated(Guid ItemId, string Name, string Description);
-// public record CatalogItemDeleted(Guid ItemId);
+public record CreateObjectResponse(IObjectServiceBusResponse<IObject> Payload);
+public record RegisterObjectResponse(IServiceBusResponse<Guid> Payload);
+public record GetAllObjectsResponse(IObjectServiceBusResponse<IObject> Payload);

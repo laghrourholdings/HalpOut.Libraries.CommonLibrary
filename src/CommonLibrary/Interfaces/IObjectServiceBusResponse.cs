@@ -2,8 +2,8 @@
 
 namespace CommonLibrary.Interfaces;
 
-public interface IObjectServiceBusResponse<TOldSubject,TSubject> : 
-    IServiceBusResponse<TOldSubject,TSubject> where TSubject : IObject
+public interface IObjectServiceBusResponse<TNewSubject> : 
+    IServiceBusResponse<TNewSubject> where TNewSubject : IObject
 {
     
 }

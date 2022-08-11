@@ -2,12 +2,8 @@
 
 namespace CommonLibrary.Interfaces;
 
-public interface IServiceBusRequest<TSubject>
+public interface IServiceBusRequest<TSubject> : IServiceBusMessage
 {
-    public string Contract { get; set; }
-    public TSubject Subject { get; set; }
-    public string Descriptor { get; set; }
-    
-    public string? Data { get; set; }
-    public Guid? LogHandleId { get; set; }
+    public TSubject? Subject { get; set; }
+    public IEnumerable<TSubject>? Subjects { get; set; }
 }

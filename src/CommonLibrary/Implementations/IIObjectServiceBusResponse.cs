@@ -4,8 +4,7 @@ using CommonLibrary.Interfaces;
 
 namespace CommonLibrary.Implementations;
 
-public class ObjectServiceBusResponse
-    : IObjectServiceBusResponse<IObject>
+public class IIObjectServiceBusResponse : IObjectServiceBusResponse<IObject>
 {
     public string Descriptor { get; set; }
     public string Contract { get; set; }

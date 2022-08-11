@@ -1,6 +1,8 @@
-﻿namespace CommonLibrary.Implementations;
+﻿using CommonLibrary.Interfaces;
 
-public class Empty
+namespace CommonLibrary.Implementations;
+
+public class Empty : IEmpty
 {
     
 }

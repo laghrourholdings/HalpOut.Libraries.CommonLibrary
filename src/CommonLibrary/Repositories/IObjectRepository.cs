@@ -2,7 +2,6 @@
 
 namespace CommonLibrary.Repositories;
 
-//TODO: Correctly implement this class.
-public interface IObjectRepository : IRepository<IObject>
+public interface IObjectRepository<T> : IRepository<T> where T:IObject
 {
 }

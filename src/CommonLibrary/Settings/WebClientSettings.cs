@@ -2,6 +2,6 @@
 
 public static class WebClientSettings
 {
-    public static string? gatewayServiceDevURL = "http://localhost:5010/gateway";
-    public static string? gatewayServiceDockerURL = "http://localhost:5054/gateway";
+    public static readonly string? GatewayServiceDevURL = "https://localhost:4044";
+    public static readonly string? InternalServiceDevURL = "https://localhost:4042";
 }
