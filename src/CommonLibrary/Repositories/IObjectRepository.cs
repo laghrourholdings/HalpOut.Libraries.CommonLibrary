@@ -1,4 +1,4 @@
-﻿using CommonLibrary.Entities.InternalService;
+﻿using CommonLibrary.Core;
 
 namespace CommonLibrary.Repositories;
 
