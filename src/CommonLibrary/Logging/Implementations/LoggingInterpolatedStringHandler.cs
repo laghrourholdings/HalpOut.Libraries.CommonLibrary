@@ -5,6 +5,7 @@ namespace CommonLibrary.Logging;
 [InterpolatedStringHandler]
 public ref struct LoggingInterpolatedStringHandler
 {
+
     private DefaultInterpolatedStringHandler _innerHandler;
     public List<object?> Parameters { get; } = new();
 

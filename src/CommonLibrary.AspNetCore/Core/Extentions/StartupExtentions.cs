@@ -1,7 +1,10 @@
-﻿using CommonLibrary.AspNetCore.MassTransit;
+﻿using CommonLibrary.AspNetCore.Configurations;
+using CommonLibrary.AspNetCore.Logging;
+using CommonLibrary.AspNetCore.MassTransit;
 using CommonLibrary.AspNetCore.Policies;
-using CommonLibrary.Settings;
+using CommonLibrary.AspNetCore.Settings;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,30 +12,82 @@ using Serilog;
 using ILogger = Serilog.ILogger;
 
 namespace CommonLibrary.AspNetCore;
+/*[ApiController]
+[Route("[controller]")]
+public class RequestController : ControllerBase
+{
+    private readonly ClientPolicy _clientPolicy;
+    private readonly IHttpClientFactory _clientFactory;
 
+    public RequestController(ClientPolicy clientPolicy, IHttpClientFactory httpClientFactory)
+    {
+        _clientFactory = httpClientFactory;
+        _clientPolicy = clientPolicy;
+    }
+    
+    [HttpGet]
+    public async Task<ActionResult> MakeRequest()
+    {
+        var client = _clientFactory.CreateClient();
+        var response = await client.GetAsync("https://localhost:7111/response/30");
+        //var response = await _clientPolicy.LinearHttpRetryPolicy.ExecuteAsync(
+        //    ()=>client.GetAsync("https://localhost:7111/response/30"));
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("--> Request successful");
+            return Ok();
+        }
+        Console.WriteLine("--> Request {un}successful");
+        return StatusCode(StatusCodes.Status500InternalServerError);
+    }
+}*/
 public static class StartupExtentions
 {
     public static IServiceCollection AddCommonLibrary(this IServiceCollection services,
-        IConfiguration configuration, ILoggingBuilder logging, ILogger logger , string originName)
+        IConfiguration configuration, ILoggingBuilder logging, LoggerConfiguration loggerConfiguration , string originName)
     {
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         logging.ClearProviders();
-
+        services.Configure<RabbitMQSettings>(configuration.GetSection(nameof(RabbitMQSettings)));
+        services.Configure<ServiceSettings>(configuration.GetSection(nameof(ServiceSettings)));
+        ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
+        RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
+        ILogger logger = loggerConfiguration
+            .Enrich.WithEnvironmentName().WriteTo.ServiceBusSink().Enrich.WithProperty("servicename", serviceSettings.ServiceName)
+#if RELEASE
+            .MinimumLevel.Error()      
+#endif
+            .CreateLogger();
+        
         logging.AddSerilog(logger);
         services.AddSingleton(logger);
-        services.Configure<RabbitMQSettings>(configuration.GetSection("RabbitMQSettings"));
-        services.Configure<ServiceSettings>(configuration.GetSection("ServiceSettings"));
         services.AddCors(options =>
         {
             options.AddPolicy(name: originName,
                 policy  =>
                 {
-                    policy.AllowAnyOrigin();
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
         });
         services.AddMassTransitWithRabbitMq();
         services.AddHttpClient("HttpClient").AddPolicyHandler(
             request => new HttpClientPolicy().LinearHttpRetryPolicy);
         services.AddSingleton<HttpClientPolicy>();
+        services.AddApiVersioning(opt =>
+        {
+            opt.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1,0);
+            opt.AssumeDefaultVersionWhenUnspecified = true;
+            opt.ReportApiVersions = true;
+            opt.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader(),
+                new HeaderApiVersionReader("x-api-version"),
+                new MediaTypeApiVersionReader("x-api-version"));
+        });
+        services.AddVersionedApiExplorer(setup =>
+        {
+            setup.GroupNameFormat = "'v'VVV";
+            setup.SubstituteApiVersionInUrl = true;
+        });
+        services.ConfigureOptions<ConfigureSwaggerOptions>();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         return services;

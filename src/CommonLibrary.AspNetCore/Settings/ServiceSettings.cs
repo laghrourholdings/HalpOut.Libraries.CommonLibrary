@@ -1,4 +1,4 @@
-﻿namespace CommonLibrary.Settings;
+﻿namespace CommonLibrary.AspNetCore.Settings;
 
 public class ServiceSettings
 {

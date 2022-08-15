@@ -4,7 +4,7 @@ using CommonLibrary.Core;
 
 namespace CommonLibrary.AspNetCore.ServiceBus.Implementations;
 
-public class IIObjectServiceBusResponse : IObjectServiceBusResponse<IObject>
+public class IiObjectServiceBusMessageResponse : IObjectServiceBusMessageResponse<IObject>
 {
     public string Descriptor { get; set; }
     public string Contract { get; set; }

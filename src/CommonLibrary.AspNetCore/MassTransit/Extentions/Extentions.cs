@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using CommonLibrary.Settings;
+using CommonLibrary.AspNetCore.Settings;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
