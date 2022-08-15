@@ -10,8 +10,8 @@
         <Authors>Laghrour Holdings</Authors>
         <Company>Laghrour Holdings</Company>
         <Product>ForYou.CommonLibrary</Product>
-        <PackageVersion>1.0.6</PackageVersion>
-        <Version>1.0.6</Version>
+        <PackageVersion>1.0.7</PackageVersion>
+        <Version>1.0.7</Version>
     </PropertyGroup>
 
     <ItemGroup>

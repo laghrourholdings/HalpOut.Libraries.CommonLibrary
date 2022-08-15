@@ -4,6 +4,14 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Copyright>Laghrour Holdings</Copyright>
+        <PackageId>LH.ForYou.CommonLibrary.ClientServices</PackageId>
+        <Authors>Laghrour Holdings</Authors>
+        <Company>Laghrour Holdings</Company>
+        <Product>ForYou.CommonLibrary.ClientServices</Product>
+        <PackageVersion>1.0.1</PackageVersion>
+        <Version>1.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
