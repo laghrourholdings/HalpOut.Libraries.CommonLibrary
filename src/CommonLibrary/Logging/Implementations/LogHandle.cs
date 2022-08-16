@@ -2,6 +2,10 @@
 
 namespace CommonLibrary.Logging;
 
+/// <summary>
+/// The LogHandle class is the default implementation of the ILogHandle
+/// The LogMessage is used as the type parameter for ILogMessage
+/// </summary>
 public class LogHandle : ILogHandle<LogMessage,ICollection<LogMessage>/*,IIObject*/>
 {
     public Guid Id { get; set; }
