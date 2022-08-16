@@ -64,7 +64,7 @@ public static class StartupExtentions
         ILogger logger = loggerConfiguration
             .Enrich.WithEnvironmentName().WriteTo.ServiceBusSink().Enrich.WithProperty("servicename", serviceSettings.ServiceName)
 #if RELEASE
-            .MinimumLevel.Error()      
+            .MinimumLevel.Warning()      
 #endif
             .CreateLogger();
         

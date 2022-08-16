@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using CommonLibrary.Logging;
 
 namespace CommonLibrary.Core;
@@ -7,6 +8,7 @@ namespace CommonLibrary.Core;
 /// The IIObject class is the base BOI required for all interservies operations and logic.
 /// Inherits the IObject interface
 /// </summary>
+[Table("IObjects")]
 public class IIObject: IObject
 {
     [Key]
@@ -17,6 +19,5 @@ public class IIObject: IObject
     public bool IsSuspended { get; set; }
     public DateTimeOffset SuspendedDate { get; set; }
     public Guid LogHandleId { get; set; }
-    public LogHandle? LogHandle { get; set; }
     public string? Descriptor { get; set; }
 }
