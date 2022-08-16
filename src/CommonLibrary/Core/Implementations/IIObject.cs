@@ -3,6 +3,10 @@ using CommonLibrary.Logging;
 
 namespace CommonLibrary.Core;
 
+/// <summary>
+/// The IIObject class is the base BOI required for all interservies operations and logic.
+/// Inherits the IObject interface
+/// </summary>
 public class IIObject: IObject
 {
     [Key]
