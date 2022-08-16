@@ -43,6 +43,15 @@ public class RequestController : ControllerBase
 }*/
 public static class StartupExtentions
 {
+    
+    /// <summary>
+    /// Main bootstrap method for the components provided by the CommonLibrary.AspNetCore
+    /// Every back-end servince running on Asp.Net must call this method in program.cs
+    /// </summary>
+    /// <param name="configuration">IConfiguration provided by builder.Configuration</param>
+    /// <param name="logging">ILoggingBuilder used in conjunction with the LoggerConfiguration</param>
+    /// <param name="loggerConfiguration">ILoggerConfiguration binded with Serilog's ILogger</param>
+    /// <param name="originName">Name of the CORS origin policy (defaulted to none)</param>
     public static IServiceCollection AddCommonLibrary(this IServiceCollection services,
         IConfiguration configuration, ILoggingBuilder logging, LoggerConfiguration loggerConfiguration , string originName)
     {
