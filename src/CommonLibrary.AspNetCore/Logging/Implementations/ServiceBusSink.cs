@@ -18,6 +18,7 @@ public class ServiceBusSink : ILogEventSink
     //Change log object so that message => json text
     public void Emit(LogEvent logEvent)
     {
+        return;
         string servicename = logEvent.Properties.GetValueOrDefault("servicename")?.ToString()
                              ?? throw new InvalidOperationException();
         var logInput = logEvent.RenderMessage(_formatProvider);
@@ -30,7 +31,6 @@ public class ServiceBusSink : ILogEventSink
         // };
         // Console.WriteLine($"Requesting object creation with guid: {suggestedGuid}");
         // await _publishEndpoint.Publish(new CreateObject(request));
-        Console.WriteLine($"{logInput} with {servicename} received!!");
     }
 
 }
