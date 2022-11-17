@@ -2,10 +2,10 @@
 
 namespace CommonLibrary.AspNetCore.ServiceBus;
 
-public interface IServiceBusMessageResponse<TSubject> : 
+public interface IServiceBusPayloadResponse<TOldSubject, TSubject> : 
     IServiceBusPayload<TSubject>
 {
-    public IServiceBusMessage InitialRequest { get; set; }
+    public IServiceBusPayload<TOldSubject> InitialPayload { get; set; }
     public HttpStatusCode StatusCode {get; set;}
 
 }

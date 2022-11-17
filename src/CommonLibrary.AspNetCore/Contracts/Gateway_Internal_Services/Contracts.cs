@@ -5,8 +5,8 @@ using CommonLibrary.Core;
 namespace CommonLibrary.AspNetCore.Contracts;
 
 //Gateway to Internal
-public record RegisterObject(IObjectServiceBusRequest<IIObject> Payload);
-public record GetAllObjects(IServiceBusRequest<IIObject> Payload);
+public record RegisterObject(IObjectServiceBusPayload<IIObject> Payload);
+public record GetAllObjects(IServiceBusPayload<IIObject> Payload);
 
 
 //Internal to Gateway

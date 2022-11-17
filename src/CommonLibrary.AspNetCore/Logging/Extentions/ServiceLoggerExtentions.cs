@@ -11,7 +11,7 @@ public static class ServiceLoggerExtentions
     
     // public static void ScanToBusLog<T>(IServiceBusLogContext<T> context,
     //     ILogger logger, ref LoggingInterpolatedStringHandler handler)
-    //     where T : IServiceBusRequest<T>
+    //     where T : IServiceBusPayload<T>
     // {
     //     
     // }

@@ -9,7 +9,7 @@ namespace CommonLibrary.Core;
 /// Inherits the IObject interface
 /// </summary>
 [Table("IObjects")]
-public class IIObject: IObject
+public class IIObject: IObject, ILoggable
 {
     [Key]
     public Guid Id { get; set; }

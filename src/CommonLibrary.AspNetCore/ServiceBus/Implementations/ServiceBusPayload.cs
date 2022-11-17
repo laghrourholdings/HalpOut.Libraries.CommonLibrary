@@ -1,6 +1,6 @@
 ﻿namespace CommonLibrary.AspNetCore.ServiceBus;
 
-public class ServiceBusRequest<TSubject> : IServiceBusRequest<TSubject>
+public class ServiceBusPayload<TSubject> : IServiceBusPayload<TSubject>
 {
     public string Contract { get; set; }
     public string Descriptor { get; set; }

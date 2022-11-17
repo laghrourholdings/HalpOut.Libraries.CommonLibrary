@@ -9,14 +9,20 @@ namespace CommonLibrary.Logging;
 /// The LogMessage is used as the type parameter for ILogMessage
 /// </summary>
 
-public class LogHandle : ILogHandle<LogMessage,ICollection<LogMessage>,IIObject>
+public class LogHandle : ILogHandle<LogMessage,List<LogMessage>>
 {
     [Key]
     public Guid Id { get; set; }
     public Guid ObjectId { get; set; }
-    [ForeignKey("ObjectId")]
-    public IIObject Object { get; set; }
+    public DateTimeOffset CreationDate { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTimeOffset DeletedDate { get; set; }
+    public bool IsSuspended { get; set; }
+    public DateTimeOffset SuspendedDate { get; set; }
+    public string? Descriptor { get; set; }
+
+    public string ObjectType { get; set; }
     public string? LocationDetails { get; set; }
     public string? AuthorizationDetails { get; set; }
-    public ICollection<LogMessage> Messages { get; set; } = new List<LogMessage>();
+    public List<LogMessage>? Messages { get; set; }
 }

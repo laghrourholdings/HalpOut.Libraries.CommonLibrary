@@ -7,8 +7,8 @@ namespace CommonLibrary.AspNetCore.Contracts;
 //Gateway to Internal
 public record CreateObject(IServiceBusMessage Payload);
 //Internal to Log
-public record LogCreateObject(ServiceBusLogContext<ServiceBusRequest<IIObject>> Payload);
+//public record LogCreateObject(ServiceBusLogContext<ServiceBusPayload<IIObject>> Payload);
 //Log to Internal
-public record LogCreateObjectResponse(ServiceBusMessageReponse<IIObject> Payload);
+public record UpdateObjectLogHandle(IServiceBusPayload<IIObject> Payload);
 //Internal to Gateway
-public record CreateObjectResponse(IServiceBusRequest<IIObject> Payload);
+public record ObjectCreated(IServiceBusMessageResponse<IIObject> Payload);

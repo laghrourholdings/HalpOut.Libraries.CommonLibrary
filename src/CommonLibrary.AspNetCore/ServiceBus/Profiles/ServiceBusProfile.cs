@@ -9,8 +9,8 @@ public class ServiceBusProfile : Profile
     {
         //Source -> Target
         CreateMap<IiObjectServiceBusMessageResponse, ServiceBusMessage>();
-        CreateMap<IIObjectServiceBusRequest, ServiceBusMessage>();
+        CreateMap<IiObjectServiceBusPayload, ServiceBusMessage>();
         CreateMap<ServiceBusMessageReponse<object>, ServiceBusMessage>();
-        CreateMap<ServiceBusRequest<object>, ServiceBusMessage>();
+        CreateMap<ServiceBusPayload<object>, ServiceBusMessage>();
     }
 }

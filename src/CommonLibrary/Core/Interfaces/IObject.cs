@@ -8,6 +8,5 @@ public interface IObject
     DateTimeOffset DeletedDate { get; set; }
     bool IsSuspended { get; set; }
     DateTimeOffset SuspendedDate { get; set; }
-    Guid LogHandleId { get; set; }
     string? Descriptor { get; set; }
 }

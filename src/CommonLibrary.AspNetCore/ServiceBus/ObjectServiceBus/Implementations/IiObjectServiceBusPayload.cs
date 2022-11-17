@@ -3,7 +3,7 @@ using CommonLibrary.Core;
 
 namespace CommonLibrary.AspNetCore.ServiceBus.Implementations;
 
-public abstract class IIObjectServiceBusRequest : IObjectServiceBusRequest<IObject> 
+public abstract class IiObjectServiceBusPayload : IObjectServiceBusPayload<IObject> 
 {
     public string Descriptor { get; set; }
     public string Contract { get; set; }

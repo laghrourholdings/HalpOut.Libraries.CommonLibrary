@@ -7,13 +7,19 @@ namespace CommonLibrary.Logging;
  /// <summary>
     /// Default implementation for the ILogMessage BOI
 /// </summary>
-[Table("ILogMessage")]
+[Table("LogMessages")]
 public class LogMessage : ILogMessage
 {
-    public int Id { get; set; }
-    public Guid ObjectId { get; set; }
-    public IIObject Object { get; set; }
+    public Guid Id { get; set; }
     public DateTimeOffset CreationDate { get; set; }
-    public string Message { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTimeOffset DeletedDate { get; set; }
+    public bool IsSuspended { get; set; }
+    public DateTimeOffset SuspendedDate { get; set; }
+    
+    public Guid LogHandleId { get; set; }
+    public LogHandle LogHandle { get; set; } // Reference navigation
+    
+    public string? Descriptor { get; set; }
     public LogLevel Severity { get; set; }
 }
