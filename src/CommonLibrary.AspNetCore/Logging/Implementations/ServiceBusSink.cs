@@ -19,7 +19,6 @@ public class ServiceBusSink : ILogEventSink
     public void Emit(LogEvent logEvent)
     {
         var log = logEvent.RenderMessage(_formatProvider);
-        Console.WriteLine("log!");
         return;
         string servicename = logEvent.Properties.GetValueOrDefault("servicename")?.ToString()
                              ?? throw new InvalidOperationException();
