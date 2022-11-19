@@ -1,5 +1,6 @@
 using CommonLibrary.AspNetCore.ServiceBus;
 using CommonLibrary.Core;
+using CommonLibrary.Logging;
 
 namespace CommonLibrary.AspNetCore.Contracts.LogMessage;
 

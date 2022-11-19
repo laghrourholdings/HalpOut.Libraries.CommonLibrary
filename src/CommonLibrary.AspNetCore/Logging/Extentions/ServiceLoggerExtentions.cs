@@ -1,6 +1,8 @@
 ﻿using CommonLibrary.AspNetCore.ServiceBus;
 using CommonLibrary.Logging;
 using MassTransit;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ILogger = Serilog.ILogger;
 
 namespace CommonLibrary.AspNetCore.Logging;
@@ -16,42 +18,50 @@ public static class ServiceLoggerExtentions
     //     
     // }
     
-    public static void GeneralToBusLog<T>(this ILogger logger, IServiceBusLogContext<T> context,
-         ref LoggingInterpolatedStringHandler handler, IPublishEndpoint publishEndpoint, object logContract)
-        where T :IServiceBusMessage
+    public static void InformationToBusLog(this ILogger logger, IConfiguration config,
+          string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
     {
-        logger.General(ref handler);
-        publishEndpoint.Publish(logContract);
-    }
-
-    public static void MetaToBusLog<T>(this ILogger logger, IServiceBusLogContext<T> context,
-        ref LoggingInterpolatedStringHandler handler, IPublishEndpoint publishEndpoint, object logContract)
-        where T : IServiceBusMessage
-    {
-        logger.Meta(ref handler);
-        publishEndpoint.Publish(logContract);
-    }
-
-    public static void FailureToBusLog<T>(this ILogger logger, IServiceBusLogContext<T> context,
-        ref LoggingInterpolatedStringHandler handler, IPublishEndpoint publishEndpoint, object logContract)
-        where T : IServiceBusMessage
-    {
-        logger.Failure(ref handler);
-        publishEndpoint.Publish(logContract);
-    }
-
-    public static void WarnToBusLog<T>(
-        this ILogger logger, IServiceBusLogContext<T> context, 
-        ref LoggingInterpolatedStringHandler handler, IPublishEndpoint publishEndpoint, object logContract)
-        where T : IServiceBusMessage
-    {
-        logger.Warn(ref handler);
-        publishEndpoint.Publish(logContract);
+        logger.Information(message);
+        publishEndpoint.PublishLogMessage(config, LogLevel.Information, logHandleId,message);
     }
     
-   
 
-    public static void CriticalBusLog<T>(this ILogger logger, IServiceBusLogContext<T> context, 
+    public static void VerboseToBusLog(this ILogger logger, IConfiguration config,
+        string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
+    {
+        logger.Information(message);
+        publishEndpoint.PublishLogMessage(config, LogLevel.None, logHandleId, message);
+    }
+
+    public static void FatalToBusLog(this ILogger logger, IConfiguration config,
+        string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
+    {
+        logger.Information(message);
+        publishEndpoint.PublishLogMessage(config, LogLevel.Critical, logHandleId, message);
+    }
+
+    public static void WarningToBusLog(this ILogger logger, IConfiguration config,
+        string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
+    {
+        logger.Information(message);
+        publishEndpoint.PublishLogMessage(config, LogLevel.Warning, logHandleId, message);
+    }
+    
+    public static void ErrorToBusLog(this ILogger logger, IConfiguration config,
+        string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
+    {
+        logger.Information(message);
+        publishEndpoint.PublishLogMessage(config, LogLevel.Error, logHandleId, message);
+    }
+    
+    public static void DebugToBusLog(this ILogger logger, IConfiguration config,
+        string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
+    {
+        logger.Information(message);
+        publishEndpoint.PublishLogMessage(config, LogLevel.Debug, logHandleId, message);
+    }
+
+    /*public static void CriticalBusLog<T>(this ILogger logger, IServiceBusLogContext<T> context, 
         ref LoggingInterpolatedStringHandler handler, IPublishEndpoint publishEndpoint, object logContract)
         where T : IServiceBusMessage
     {
@@ -82,5 +92,5 @@ public static class ServiceLoggerExtentions
     public static void Failure(this ILogger logger, ref LoggingInterpolatedStringHandler handler)
     {
         logger.Error(handler.ToString(), handler.Parameters.ToArray());
-    }
+    }*/
 }
