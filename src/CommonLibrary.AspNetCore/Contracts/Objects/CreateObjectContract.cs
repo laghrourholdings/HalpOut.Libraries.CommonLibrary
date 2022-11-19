@@ -1,8 +1,7 @@
-﻿using CommonLibrary.AspNetCore.Logging;
-using CommonLibrary.AspNetCore.ServiceBus;
+﻿using CommonLibrary.AspNetCore.ServiceBus;
 using CommonLibrary.Core;
 
-namespace CommonLibrary.AspNetCore.Contracts;
+namespace CommonLibrary.AspNetCore.Contracts.Objects;
 
 //Gateway to Internal
 public record CreateObject(IServiceBusMessage Payload);

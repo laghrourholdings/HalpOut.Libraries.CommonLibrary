@@ -2,7 +2,7 @@
 using CommonLibrary.AspNetCore.ServiceBus.Interfaces;
 using CommonLibrary.Core;
 
-namespace CommonLibrary.AspNetCore.Contracts;
+namespace CommonLibrary.AspNetCore.Contracts.Objects;
 
 //Gateway to Internal
 public record RegisterObject(IObjectServiceBusPayload<IIObject> Payload);

@@ -1,7 +1,0 @@
-﻿namespace CommonLibrary.AspNetCore.Contracts;
-
-
-
-
-
- 
