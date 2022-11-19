@@ -9,5 +9,5 @@ public record CreateObject(IServiceBusMessage Payload);
 //public record LogCreateObject(ServiceBusLogContext<ServiceBusPayload<IIObject>> Payload);
 //Log to Internal
 public record UpdateObjectLogHandle(IServiceBusPayload<IIObject> Payload);
-//Internal to Gateway
+//Internal to Log
 public record ObjectCreated(IServiceBusMessageResponse<IIObject> Payload);
