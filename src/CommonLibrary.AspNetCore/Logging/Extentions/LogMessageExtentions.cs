@@ -34,10 +34,6 @@ public static class LogMessageExtentions
         {
             Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
-            IsDeleted = false,
-            DeletedDate = default,
-            IsSuspended = false,
-            SuspendedDate = default,
             LogHandleId = logHandleId,
             Descriptor = $"{serviceSettings.ServiceName} | {message}",
             Severity = severity
@@ -51,10 +47,6 @@ public static class LogMessageExtentions
         {
             Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
-            IsDeleted = false,
-            DeletedDate = default,
-            IsSuspended = false,
-            SuspendedDate = default,
             LogHandleId = logHandle.Id,
             Descriptor = $"{serviceSettings.ServiceName} | {message}",
             Severity = severity
@@ -77,10 +69,6 @@ public static class LogMessageExtentions
         {
             Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
-            IsDeleted = false,
-            DeletedDate = default,
-            IsSuspended = false,
-            SuspendedDate = default,
             LogHandleId = logHandleId,
             Descriptor = $"{serviceSettings.ServiceName} | {message}",
             Severity = severity

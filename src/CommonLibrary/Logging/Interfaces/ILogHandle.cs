@@ -4,7 +4,7 @@ using CommonLibrary.Core;
 
 namespace CommonLibrary.Logging;
 
-public interface ILogHandle<TLogMessage,TEnumerable> : IObject
+public interface ILogHandle<TLogMessage,TEnumerable> : IObject, ISuspendable, IDeletable
     where TLogMessage : ILogMessage
     where TEnumerable:IEnumerable<TLogMessage>
 {

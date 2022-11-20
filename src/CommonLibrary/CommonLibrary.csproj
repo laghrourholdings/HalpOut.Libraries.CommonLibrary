@@ -35,6 +35,7 @@
       <Folder Include="Core\Extentions" />
       <Folder Include="InterfaceCast\Interfaces" />
       <Folder Include="Logging\Extentions" />
+      <Folder Include="Logging\Implementations\Dtos" />
     </ItemGroup>
 
 </Project>
