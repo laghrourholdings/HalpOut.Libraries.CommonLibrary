@@ -106,7 +106,6 @@ public static class StartupExtentions
         app.UseCors(originName);
 
         app.UseHttpsRedirection();
-
         app.UseAuthorization();
 
         app.MapControllers();
