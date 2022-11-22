@@ -99,6 +99,7 @@ public static class StartupExtentions
         services.ConfigureOptions<ConfigureSwaggerOptions>();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
+        services.AddAuthorization(options => Identity.Policies.UserPolicies(options));
         return services;
     }
     public static WebApplication UseCommonLibrary(this WebApplication app, string originName)
