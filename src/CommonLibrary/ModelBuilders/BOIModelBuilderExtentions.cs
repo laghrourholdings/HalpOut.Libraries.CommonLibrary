@@ -1,6 +1,4 @@
-﻿using CommonLibrary.Core;
-using CommonLibrary.Logging;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace CommonLibrary.ModelBuilders;
 

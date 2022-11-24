@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using CommonLibrary.AspNetCore.ServiceBus;
 using CommonLibrary.AspNetCore.Settings;
-using CommonLibrary.InterfaceCast;
 using CommonLibrary.Logging;
 using MassTransit;
 using Microsoft.Extensions.Logging;

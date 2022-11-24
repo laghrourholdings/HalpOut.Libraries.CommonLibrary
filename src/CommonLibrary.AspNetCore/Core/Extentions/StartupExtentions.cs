@@ -55,6 +55,7 @@ public static class StartupExtentions
     public static IServiceCollection AddCommonLibrary(this IServiceCollection services,
         IConfiguration configuration, ILoggingBuilder logging, LoggerConfiguration loggerConfiguration , string originName)
     {
+        services.AddHttpContextAccessor();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         logging.ClearProviders();
         services.Configure<RabbitMQSettings>(configuration.GetSection(nameof(RabbitMQSettings)));
@@ -104,9 +105,10 @@ public static class StartupExtentions
     }
     public static WebApplication UseCommonLibrary(this WebApplication app, string originName)
     {
-        app.UseCors(originName);
 
         app.UseHttpsRedirection();
+        app.UseCors(originName);
+
         app.UseAuthorization();
 
         app.MapControllers();

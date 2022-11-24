@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using CommonLibrary.Core;
+﻿using CommonLibrary.Core;
 
 namespace CommonLibrary.Logging;
 

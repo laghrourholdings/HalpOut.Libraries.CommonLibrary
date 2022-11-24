@@ -1,6 +1,4 @@
-﻿using CommonLibrary.AspNetCore.ServiceBus;
-using CommonLibrary.Logging;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ILogger = Serilog.ILogger;
