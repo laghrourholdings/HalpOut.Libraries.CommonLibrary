@@ -13,6 +13,7 @@ public class UserDevice : IObject, ISuspendable, IDeletable
     public string? DeviceType { get; set; } 
     public string? DeviceModel { get; set; }
     public string? DeviceOs { get; set; }
+    public string? Hash { get; set; }
     public bool IsSuspended { get; set; }
     public DateTimeOffset SuspendedDate { get; set; }
     public Guid SuspendedBy { get; set; }

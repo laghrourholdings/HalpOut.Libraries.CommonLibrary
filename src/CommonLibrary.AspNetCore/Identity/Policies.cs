@@ -10,7 +10,7 @@ public static class Policies
     public static AuthorizationOptions UserPolicies(AuthorizationOptions options)
     {
         options.AddPolicy(ELEVATED_RIGHTS, policy =>
-            policy.RequireRole("Administrator"));
+            policy.RequireRole("Admin"));
         options.AddPolicy(AUTHENTICATED, policy =>
             policy.RequireAuthenticatedUser());
         return options;
