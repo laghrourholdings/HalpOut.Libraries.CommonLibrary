@@ -2,30 +2,30 @@
 
 public interface ILoggingService
 {
-    public void InformationToLogService(
+    public void Information(
         string message,
-        Guid logHandleId);
+        Guid logHandleId = default);
     
-    public void VerboseToLogService(
+    public void Verbose(
         string message,
-        Guid logHandleId);
+        Guid logHandleId = default);
     
-    public void FatalToLogService(
+    public void Critical(
         string message,
-        Guid logHandleId);
+        Guid logHandleId = default);
     
     
-    public void WarningToLogService(
+    public void Warning(
         string message,
-        Guid logHandleId);
+        Guid logHandleId = default);
     
-    public void ErrorToLogService(
+    public void Error(
         string message,
-        Guid logHandleId);
+        Guid logHandleId = default);
     
-    public void DebugToLogService(
+    public void Debug(
         string message,
-        Guid logHandleId);
+        Guid logHandleId = default);
     
     public Serilog.ILogger Log();
 }

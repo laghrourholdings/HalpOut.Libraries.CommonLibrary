@@ -34,7 +34,8 @@ public static class LogMessageExtentions
             Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
             LogHandleId = logHandleId,
-            Descriptor = $"{DateTimeOffset.Now} | {serviceSettings.ServiceName} | {message}",
+            /*Descriptor = $"{DateTimeOffset.Now} | {serviceSettings.ServiceName} | {message}",*/
+            Descriptor = $"{serviceSettings.ServiceName} | {message}",
             Severity = severity
         };
     }
@@ -47,7 +48,8 @@ public static class LogMessageExtentions
             Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
             LogHandleId = logHandle.Id,
-            Descriptor = $"{DateTimeOffset.Now} | {serviceSettings.ServiceName} | {message}",
+            /*Descriptor = $"{DateTimeOffset.Now} | {serviceSettings.ServiceName} | {message}",*/
+            Descriptor = $"{serviceSettings.ServiceName} | {message}",
             Severity = severity
         };
         if (logHandle.Messages != null) 
