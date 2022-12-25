@@ -1,5 +1,4 @@
 ﻿using CommonLibrary.Core;
-using Microsoft.AspNetCore.Identity;
 
 namespace CommonLibrary.AspNetCore;
 

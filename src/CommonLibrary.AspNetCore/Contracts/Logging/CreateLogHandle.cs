@@ -1,5 +1,3 @@
-using CommonLibrary.AspNetCore.ServiceBus;
-
 namespace CommonLibrary.AspNetCore.Contracts.Logging;
 
 //public record CreateLogMessage(IServiceBusPayload<CommonLibrary.Logging.LogMessage> Payload);
