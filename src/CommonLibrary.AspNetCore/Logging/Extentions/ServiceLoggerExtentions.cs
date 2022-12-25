@@ -19,7 +19,6 @@ public static class ServiceLoggerExtentions
     public static void InformationToBusLog(this ILogger logger, IConfiguration config,
           string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
     {
-        logger.Information(message);
         publishEndpoint.PublishLogMessage(config, LogLevel.Information, logHandleId,message);
     }
 
@@ -27,35 +26,30 @@ public static class ServiceLoggerExtentions
     public static void VerboseToBusLog(this ILogger logger, IConfiguration config,
         string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
     {
-        logger.Information(message);
         publishEndpoint.PublishLogMessage(config, LogLevel.None, logHandleId, message);
     }
 
     public static void FatalToBusLog(this ILogger logger, IConfiguration config,
         string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
     {
-        logger.Information(message);
         publishEndpoint.PublishLogMessage(config, LogLevel.Critical, logHandleId, message);
     }
 
     public static void WarningToBusLog(this ILogger logger, IConfiguration config,
         string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
     {
-        logger.Information(message);
         publishEndpoint.PublishLogMessage(config, LogLevel.Warning, logHandleId, message);
     }
     
     public static void ErrorToBusLog(this ILogger logger, IConfiguration config,
         string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
     {
-        logger.Information(message);
         publishEndpoint.PublishLogMessage(config, LogLevel.Error, logHandleId, message);
     }
     
     public static void DebugToBusLog(this ILogger logger, IConfiguration config,
         string message, Guid logHandleId, IPublishEndpoint publishEndpoint)
     {
-        logger.Information(message);
         publishEndpoint.PublishLogMessage(config, LogLevel.Debug, logHandleId, message);
     }
 

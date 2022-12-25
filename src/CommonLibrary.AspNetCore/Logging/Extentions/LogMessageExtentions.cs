@@ -1,4 +1,4 @@
-﻿using CommonLibrary.AspNetCore.Contracts.LogMessage;
+﻿using CommonLibrary.AspNetCore.Contracts.Logging;
 using Microsoft.Extensions.Configuration;
 using CommonLibrary.AspNetCore.ServiceBus;
 using CommonLibrary.AspNetCore.Settings;
@@ -12,7 +12,7 @@ public static class LogMessageExtentions
 {
 
 
-    public static ServiceBusPayload<TLogMessage> GetContract<TLogMessage>
+    /*public static ServiceBusPayload<TLogMessage> GetContract<TLogMessage>
         (this TLogMessage logMessage, IConfiguration configuration) where TLogMessage : ILogMessage, new()
     {
         ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
@@ -24,7 +24,7 @@ public static class LogMessageExtentions
             Descriptor = $"Creation of LogMessage {logMessage.Id}"
         };
         return serviceBusPayload;
-    }
+    }*/
 
     public static LogMessage GetLogMessage(IConfiguration configuration, LogLevel severity, Guid logHandleId, string message )
     {
@@ -34,12 +34,12 @@ public static class LogMessageExtentions
             Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
             LogHandleId = logHandleId,
-            Descriptor = $"{serviceSettings.ServiceName} | {message}",
+            Descriptor = $"{DateTimeOffset.Now} | {serviceSettings.ServiceName} | {message}",
             Severity = severity
         };
     }
     
-    public static LogMessage LogMessage(this LogHandle logHandle, IConfiguration configuration, LogLevel severity, string message )
+    public static LogMessage AttachLogMessage(this LogHandle logHandle, IConfiguration configuration, LogLevel severity, string message )
     {
         ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
         var logMessage = new LogMessage
@@ -47,7 +47,7 @@ public static class LogMessageExtentions
             Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
             LogHandleId = logHandle.Id,
-            Descriptor = $"{serviceSettings.ServiceName} | {message}",
+            Descriptor = $"{DateTimeOffset.Now} | {serviceSettings.ServiceName} | {message}",
             Severity = severity
         };
         if (logHandle.Messages != null) 
@@ -74,7 +74,7 @@ public static class LogMessageExtentions
         };
     }
     
-    public static ServiceBusPayload<TLogMessage> GetContract<TLogMessage>
+    /*public static ServiceBusPayload<TLogMessage> GetContract<TLogMessage>
         (IConfiguration configuration, LogLevel severity, Guid logHandleId, string message) where TLogMessage : ILogMessage, new()
     {
         var logMessage = GetGenericLogMessage<TLogMessage>(configuration, severity, logHandleId, message);
@@ -85,19 +85,19 @@ public static class LogMessageExtentions
             Descriptor = $"Creation of LogMessage {message}"
         };
         return serviceBusPayload;
-    }
+    }*/
     
     public static void PublishLogMessage
         (this IPublishEndpoint publishEndpoint, IConfiguration configuration, LogLevel severity, Guid logHandleId, string message) 
     {
         var logMessage = GetLogMessage(configuration, severity, logHandleId, message);
-        var serviceBusPayload = new ServiceBusPayload<LogMessage>
-        {
-            Subject = logMessage,
-            Contract = nameof(CreateLogMessage),
-            Descriptor = $"Creation of LogMessage {logMessage.Id}"
-        };
-        publishEndpoint.Publish(new CreateLogMessage(serviceBusPayload));
+        // var serviceBusPayload = new ServiceBusPayload<LogMessage>
+        // {
+        //     Subject = logMessage,
+        //     Contract = nameof(CreateLogMessage),
+        //     Descriptor = $"Creation of LogMessage {logMessage.Id}"
+        // };
+        publishEndpoint.Publish(new CreateLogMessage(logMessage));
     }
 
 
