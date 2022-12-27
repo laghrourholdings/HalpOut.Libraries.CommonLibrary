@@ -5,7 +5,7 @@ using ILogger = Serilog.ILogger;
 
 namespace CommonLibrary.AspNetCore.Logging;
 
-public static class ServiceLoggerExtentions
+public static class LogServiceLoggerExtentions
 {
 
     
