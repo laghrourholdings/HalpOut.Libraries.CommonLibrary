@@ -1,5 +1,6 @@
 ﻿using CommonLibrary.AspNetCore.Configurations;
 using CommonLibrary.AspNetCore.Logging;
+using CommonLibrary.AspNetCore.Logging.LoggingService;
 using CommonLibrary.AspNetCore.MassTransit;
 using CommonLibrary.AspNetCore.Policies;
 using CommonLibrary.AspNetCore.Settings;
@@ -80,6 +81,7 @@ public static class StartupExtentions
                 });
         });
         services.AddMassTransitWithRabbitMq();
+        services.AddScoped<ILoggingService, LoggingService>();
         services.AddHttpClient("HttpClient").AddPolicyHandler(
             request => new HttpClientPolicy().LinearHttpRetryPolicy);
         services.AddSingleton<HttpClientPolicy>();
