@@ -1,6 +1,6 @@
 ﻿using CommonLibrary.Core;
 
-namespace CommonLibrary.AspNetCore.Identity.Model;
+namespace CommonLibrary.AspNetCore.Identity.Models;
 
 public class UserInterest : IObject
 {

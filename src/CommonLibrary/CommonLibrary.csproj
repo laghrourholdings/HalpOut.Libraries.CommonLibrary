@@ -37,9 +37,9 @@
 
     <ItemGroup>
       <Folder Include="Core\Extentions" />
-      <Folder Include="Identity" />
       <Folder Include="InterfaceCast\Interfaces" />
       <Folder Include="Logging\Extentions" />
+      <Folder Include="Logging\Models\Dtos" />
     </ItemGroup>
 
 </Project>

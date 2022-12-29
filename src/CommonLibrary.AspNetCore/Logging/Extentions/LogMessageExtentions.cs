@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using CommonLibrary.AspNetCore.Settings;
 using CommonLibrary.Logging;
+using CommonLibrary.Logging.Models;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 

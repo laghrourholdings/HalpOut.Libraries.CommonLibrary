@@ -18,6 +18,7 @@
       <Folder Include="Configurations" />
       <Folder Include="Contracts" />
       <Folder Include="Core\Extentions" />
+      <Folder Include="Identity\Models" />
       <Folder Include="Logging\Enrichers" />
       <Folder Include="Logging\Extentions" />
     </ItemGroup>

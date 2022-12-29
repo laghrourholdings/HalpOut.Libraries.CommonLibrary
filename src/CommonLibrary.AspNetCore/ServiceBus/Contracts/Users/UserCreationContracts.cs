@@ -1,4 +1,4 @@
-﻿using CommonLibrary.AspNetCore.Identity.Model.Dtos;
+﻿using CommonLibrary.Identity.Models.Dtos;
 
 namespace CommonLibrary.AspNetCore.ServiceBus.Contracts.Users;
 
