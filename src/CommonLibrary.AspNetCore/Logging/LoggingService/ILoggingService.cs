@@ -27,5 +27,5 @@ public interface ILoggingService
         string message,
         Guid logHandleId = default);
     
-    public Serilog.ILogger Log();
+    public Serilog.ILogger Local();
 }
