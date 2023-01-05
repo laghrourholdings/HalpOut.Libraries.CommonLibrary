@@ -23,7 +23,7 @@ public class LoggingService : ILoggingService
     /// Returns the current ILogger
     /// </summary>
     /// <returns>The Serilog's ILogger instance.</returns>
-    public Serilog.ILogger Log()
+    public Serilog.ILogger Local()
     {
         return _logger;
     }
