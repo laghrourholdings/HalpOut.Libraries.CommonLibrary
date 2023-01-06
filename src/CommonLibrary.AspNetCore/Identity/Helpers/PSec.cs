@@ -70,7 +70,7 @@ public static class PSec
         PasetoTokenValidationParameters? parameters = null, ProtocolVersion version = ProtocolVersion.V4)
     {
         //TODO: Fix DecodeFooter that is returning the payload instead of the footer
-        var footer = DecodeFooter(token, version);
+        var footer = token.Split(".").Last();
         var footerDecryptResult = new PasetoBuilder()
             .Use(version, Purpose.Local)
             .WithSharedKey(symmetricKey)
@@ -97,22 +97,33 @@ public static class PSec
         DateTime sessionExpiration,
     ProtocolVersion version = ProtocolVersion.V4)
     {
+        // Convert.ToBase64String(
+        //     Encoding.UTF8.GetBytes(
+        //         new PasetoBuilder()
+        //             .Expiration(sessionExpiration)
+        //             //Encoding.UTF8.GetString(publicKey)
+        //             .AddClaim("pk",CryptoBytes.ToHexStringLower(publicKey))
+        //             .AddClaim("sid",sessionId)
+        //             .Use(version, Purpose.Local)
+        //             .WithSharedKey(symmetricKey)
+        //             .Encode())
+        // ))
         return _builder
             .AddFooter(
-                    new PasetoBuilder()
-                        .Expiration(sessionExpiration)
-                        //Encoding.UTF8.GetString(publicKey)
-                        .AddClaim("pk",CryptoBytes.ToHexStringLower(publicKey))
-                        .AddClaim("sid",sessionId)
-                        .Use(version, Purpose.Local)
-                        .WithSharedKey(symmetricKey)
-                        .Encode()
-            )
+                new PasetoBuilder()
+                    .Expiration(sessionExpiration)
+                    //Encoding.UTF8.GetString(publicKey)
+                    .AddClaim("pk",CryptoBytes.ToHexStringLower(publicKey))
+                    .AddClaim("sid",sessionId)
+                    .Use(version, Purpose.Local)
+                    .WithSharedKey(symmetricKey)
+                    .Encode())
             .Use(version, Purpose.Public)
             .WithSecretKey(secretKey)
             .Encode();
     }
     //TODO: DecodePayload and DecodeFooter require a WithKey() function call.. find way to make that work.
+    //Replace footer with regular AES encryption without Paseto token.
     public static string DecodePayload(string token, ProtocolVersion version = ProtocolVersion.V4)
     {
         return new PasetoBuilder()
@@ -131,7 +142,7 @@ public static class PSec
     {
         return new PasetoBuilder()
             .Use(version, Purpose.Public)
-            .DecodeFooter(token);
+            .DecodeHeader(token);
     }
 }
 
