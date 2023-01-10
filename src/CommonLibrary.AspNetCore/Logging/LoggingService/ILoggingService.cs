@@ -26,6 +26,7 @@ public interface ILoggingService
     public void Debug(
         string message,
         Guid logHandleId = default);
-    
+
+    public void CreateLogHandle(Guid logHandleId, Guid targetObjectId, string objectType){}
     public Serilog.ILogger Local();
 }

@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using CommonLibrary.AspNetCore.ServiceBus.Contracts.Logging;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 
 namespace CommonLibrary.AspNetCore.Logging.LoggingService;
@@ -100,5 +101,13 @@ public class LoggingService : ILoggingService
         _logger.Error(message);
         if(logHandleId != Guid.Empty)
             _logger.ErrorToBusLog(_config,message, logHandleId, _publishEndpoint);
+    }
+    
+    /// <summary>
+    /// Creates a new logHandleId for a given object.
+    /// </summary>
+    public void CreateLogHandle(Guid logHandleId, Guid targetObjectId, string objectType)
+    { 
+        _publishEndpoint.Publish(new CreateLogHandle(logHandleId, targetObjectId, objectType));
     }
 }

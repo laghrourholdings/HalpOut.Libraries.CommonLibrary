@@ -61,7 +61,7 @@ public static class LogMessageExtentions
         {
             Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
-            LogHandleId = logHandle.Id,
+            LogHandleId = logHandle.LogHandleId,
             /*Descriptor = $"{DateTimeOffset.Now} | {serviceSettings.ServiceName} | {message}",*/
             Descriptor = $"{serviceSettings.ServiceName} | {message}",
             Severity = severity
@@ -82,7 +82,7 @@ public static class LogMessageExtentions
         ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
         return new T
         {
-            Id = Guid.NewGuid(),
+            //Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
             LogHandleId = logHandleId,
             Descriptor = $"{serviceSettings.ServiceName} | {message}",

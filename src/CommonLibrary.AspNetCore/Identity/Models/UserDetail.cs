@@ -1,4 +1,4 @@
-﻿using CommonLibrary.Core;
+﻿/*using CommonLibrary.Core;
 
 namespace CommonLibrary.AspNetCore.Identity.Models;
 
@@ -15,4 +15,4 @@ public class UserDetail : IObject
     public string? Locale { get; set; }
     public string? UpdatedAt { get; set; }
     public bool SubscribedToNewsletter { get; set; } = true;
-}
+}*/

@@ -34,7 +34,10 @@ public static class PSec
     {
         return new PasetoBuilder().Use(version, Purpose.Public).GenerateAsymmetricKeyPair(RandomNumberGenerator.GetBytes(32));
     }
-    
+    public static PasetoSymmetricKey GenerateSymmetricKey(ProtocolVersion version = ProtocolVersion.V4)
+    {
+        return new PasetoBuilder().Use(version, Purpose.Local).GenerateSymmetricKey();
+    }
     public static string EncodeTo64(string toEncode)
     {
         byte[] toEncodeAsBytes = Encoding.ASCII.GetBytes(toEncode);
@@ -123,9 +126,10 @@ public static class PSec
             .Decode(token, parameters);*/
     
     
-    public static string DecodePayload(string token, ProtocolVersion version = ProtocolVersion.V4) =>
+    public static string DecodePayload(string token, byte[] publicKey, ProtocolVersion version = ProtocolVersion.V4) =>
         new PasetoBuilder()
             .Use(version, Purpose.Public)
+            .WithPublicKey(publicKey)
             .DecodePayload(token);
 
     public static string DecodeFooter(string token, ProtocolVersion version = ProtocolVersion.V4) =>

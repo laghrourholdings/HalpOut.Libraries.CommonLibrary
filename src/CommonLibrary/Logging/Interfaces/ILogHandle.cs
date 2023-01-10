@@ -6,7 +6,7 @@ public interface ILogHandle<TLogMessage,TEnumerable> : IObject, ISuspendable, ID
     where TLogMessage : ILogMessage
     where TEnumerable:IEnumerable<TLogMessage>
 {
-    public Guid Id { get; set; }
+    public Guid LogHandleId { get; set; }
     public string ObjectType { get; set; }
     public string? LocationDetails { get; set; }
     public string? AuthorizationDetails { get; set; }

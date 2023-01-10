@@ -2,7 +2,7 @@ namespace CommonLibrary.Core.Models.PostalAddress
 {
     public class PostalAddress : IObject, IDeletable, ISuspendable
     {
-        public Guid Id { get; set; }
+        public Guid LogHandleId { get; set; }
 
         public DateTimeOffset CreationDate { get; set; }
         public string? Descriptor { get; set; }

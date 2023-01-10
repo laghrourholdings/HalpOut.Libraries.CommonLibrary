@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using CommonLibrary.AspNetCore.Identity.Models;
 using Paseto;
 using Paseto.Cryptography.Key;
 
@@ -8,13 +10,14 @@ namespace CommonLibrary.AspNetCore.Identity.Helpers;
 
 public static class Securoman
 {
+    public record TicketClaim(string Type, string Value);
     public static PasetoTokenValidationParameters DefaultParameters { get; } = new PasetoTokenValidationParameters
     {
         ValidateLifetime = true,
         ValidateAudience = true,
         ValidateIssuer = true,
-        ValidAudience = "auth.laghrour.com",
-        ValidIssuer = "laghrour.com"
+        ValidAudience = "laghrour.com",
+        ValidIssuer = "auth.laghrour.com"
     };
     private static byte[] AES_Encrypt(
         byte[] plain,
@@ -124,44 +127,57 @@ public static class Securoman
     
     public static string GenerateToken(
         PasetoAsymmetricKeyPair keyPair,
-        IEnumerable<Claim> claims,string sessionId)
+        IEnumerable<Claim> claims,
+        byte [] symmetricKey,
+        Guid sessionId,
+        DateTimeOffset exp)
     {
         var publicKey = keyPair.PublicKey.Key.ToArray();
         var secretKey = keyPair.SecretKey.Key.ToArray();
         
         //TODO refactor to not have hardcoded stuff
-        var tokenBuilder = PSec.CreateTokenPipe("auth.laghrour.com","laghrour.com",DateTime.UtcNow.AddMinutes(5));
-        tokenBuilder.AddClaim("sid", sessionId);
-        tokenBuilder.AddFooter(EncryptPublicKey(publicKey, PSec.DebugSymmetryKey));
-        foreach (var claim in claims)
-        {
-            tokenBuilder.AddClaim(claim.Type, claim.Value);
-        }
+        var tokenBuilder = PSec.CreateTokenPipe("auth.laghrour.com","laghrour.com",exp.DateTime);
+        //tokenBuilder.AddClaim(UserClaimTypes.UserSessionId, sessionId.ToString());
+        tokenBuilder.AddClaim(UserClaimTypes.UserTicket, JsonSerializer.Serialize(claims.Select(x => new TicketClaim(x.Type,x.Value))));
+        tokenBuilder.AddFooter(EncryptPublicKey(publicKey, symmetricKey));
+        
         
         return tokenBuilder.Sign(secretKey);
     }
 
-    public static TokenSignature VerifyToken(string token)
+    public static TokenSignature VerifyTokenWithSecret(string token, byte[] SymmetryKey)
     {
         var footer = PSec.DecodeFooter(token);
-        var publicKey = DecryptPublicKey(Convert.FromHexString(footer), PSec.DebugSymmetryKey);
-        
-        return new TokenSignature(PSec.VerifyToken(token, publicKey, DefaultParameters), publicKey);
+        var publicKey = DecryptPublicKey(Convert.FromHexString(footer), SymmetryKey);
+       return VerifyToken(token, publicKey);
+    }
+    
+    public static TokenSignature VerifyToken(string token, byte[] publicKey)
+    {
+        var result = PSec.VerifyToken(token, publicKey, DefaultParameters);
+        if (result.IsValid && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserTicket, out var ticket))
+        {
+            var claims = JsonSerializer.Deserialize<IEnumerable<TicketClaim>>(ticket.ToString());
+            return new TokenSignature(result, publicKey, claims);
+        }
+        return new TokenSignature(result);
     }
 
     public class TokenSignature
     {
         public PasetoTokenValidationResult Result { get; }
 
-        public TokenSignature(PasetoTokenValidationResult result, byte[] publicKey, Guid sessionId = default)
+        public TokenSignature(PasetoTokenValidationResult result, byte[] publicKey, IEnumerable<TicketClaim> claims)
         {
             Result = result;
             PublicKey = publicKey;
+            Claims = claims;
         }
         public TokenSignature(PasetoTokenValidationResult result)
         {
             Result = result;
         }
         public byte[] PublicKey { get; }
+        public IEnumerable<TicketClaim> Claims { get; set; }
     }
 }
