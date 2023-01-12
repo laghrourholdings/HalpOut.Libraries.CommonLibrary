@@ -16,4 +16,5 @@ public class UserSession : IDeletable
     public bool IsDeleted { get; set; } = false;
     public DateTimeOffset DeletedDate { get; set; }
     public Guid DeletedBy { get; set; } = Guid.Empty;
+    public Guid UserId { get; set; }
 }

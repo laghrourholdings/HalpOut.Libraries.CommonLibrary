@@ -1,13 +1,15 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
 using NaCl.Core.Internal;
 using Paseto;
 using Paseto.Builder;
 using Paseto.Cryptography.Key;
+using Paseto.Protocol;
 
 namespace CommonLibrary.AspNetCore.Identity.Helpers;
 
-public static class PSec
+public static class Pasetoman
 {
     public static readonly byte[] DebugSymmetryKey 
         = CryptoBytes.FromHexString("707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f");
@@ -29,15 +31,14 @@ public static class PSec
         public byte[] PublicKey { get; }
         public Guid SessionId { get;  } 
     }*/
-    
-    public static PasetoAsymmetricKeyPair GenerateAsymmetricKeyPair(ProtocolVersion version = ProtocolVersion.V4)
-    {
-        return new PasetoBuilder().Use(version, Purpose.Public).GenerateAsymmetricKeyPair(RandomNumberGenerator.GetBytes(32));
-    }
-    public static PasetoSymmetricKey GenerateSymmetricKey(ProtocolVersion version = ProtocolVersion.V4)
-    {
-        return new PasetoBuilder().Use(version, Purpose.Local).GenerateSymmetricKey();
-    }
+    public static PasetoAsymmetricKeyPair AsymmetricKeyPair(byte[] privateKey, byte[] publicKey) =>
+        new(privateKey, publicKey, new Version4());
+    public static PasetoAsymmetricKeyPair GenerateAsymmetricKeyPair(ProtocolVersion version = ProtocolVersion.V4) 
+        => new PasetoBuilder().Use(version, Purpose.Public).GenerateAsymmetricKeyPair(RandomNumberGenerator.GetBytes(32));
+
+    public static PasetoSymmetricKey GenerateSymmetricKey(ProtocolVersion version = ProtocolVersion.V4) 
+        => new PasetoBuilder().Use(version, Purpose.Local).GenerateSymmetricKey();
+
     public static string EncodeTo64(string toEncode)
     {
         byte[] toEncodeAsBytes = Encoding.ASCII.GetBytes(toEncode);
@@ -139,4 +140,14 @@ public static class PSec
     public static string DecodeHeader(string token, ProtocolVersion version = ProtocolVersion.V4) =>
         new PasetoBuilder()
             .DecodeHeader(token);
+    
+    public static byte[] SerializeToBytes(AuthenticationTicket source)
+    {
+        return TicketSerializer.Default.Serialize(source);
+    }
+    
+    public static AuthenticationTicket? DeserializeFromBytes(byte[] source)
+    {
+        return source == null ? null : TicketSerializer.Default.Deserialize(source);
+    }
 }

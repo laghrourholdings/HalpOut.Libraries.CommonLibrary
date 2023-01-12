@@ -129,14 +129,13 @@ public static class Securoman
         PasetoAsymmetricKeyPair keyPair,
         IEnumerable<Claim> claims,
         byte [] symmetricKey,
-        Guid sessionId,
         DateTimeOffset exp)
     {
         var publicKey = keyPair.PublicKey.Key.ToArray();
         var secretKey = keyPair.SecretKey.Key.ToArray();
         
         //TODO refactor to not have hardcoded stuff
-        var tokenBuilder = PSec.CreateTokenPipe("auth.laghrour.com","laghrour.com",exp.DateTime);
+        var tokenBuilder = Pasetoman.CreateTokenPipe("auth.laghrour.com","laghrour.com",exp.DateTime);
         //tokenBuilder.AddClaim(UserClaimTypes.UserSessionId, sessionId.ToString());
         tokenBuilder.AddClaim(UserClaimTypes.UserTicket, JsonSerializer.Serialize(claims.Select(x => new TicketClaim(x.Type,x.Value))));
         tokenBuilder.AddFooter(EncryptPublicKey(publicKey, symmetricKey));
@@ -145,16 +144,16 @@ public static class Securoman
         return tokenBuilder.Sign(secretKey);
     }
 
-    public static TokenSignature VerifyTokenWithSecret(string token, byte[] SymmetryKey)
+    public static TokenSignature VerifyTokenWithSecret(string token, byte[] SymmetryKey, PasetoTokenValidationParameters? paramms = null)
     {
-        var footer = PSec.DecodeFooter(token);
+        var footer = Pasetoman.DecodeFooter(token);
         var publicKey = DecryptPublicKey(Convert.FromHexString(footer), SymmetryKey);
-       return VerifyToken(token, publicKey);
+       return VerifyToken(token, publicKey, paramms);
     }
     
-    public static TokenSignature VerifyToken(string token, byte[] publicKey)
+    public static TokenSignature VerifyToken(string token, byte[] publicKey, PasetoTokenValidationParameters? paramms = null)
     {
-        var result = PSec.VerifyToken(token, publicKey, DefaultParameters);
+        var result = Pasetoman.VerifyToken(token, publicKey, paramms ?? DefaultParameters);
         if (result.IsValid && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserTicket, out var ticket))
         {
             var claims = JsonSerializer.Deserialize<IEnumerable<TicketClaim>>(ticket.ToString());
