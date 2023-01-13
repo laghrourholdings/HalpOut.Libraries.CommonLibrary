@@ -109,6 +109,6 @@ public class LoggingService : ILoggingService
     /// </summary>
     public void CreateLogHandle(Guid logHandleId, Guid targetObjectId, string objectType)
     { 
-        _publishEndpoint.Publish(new CreateLogHandle(new LogHandleDto(){Id = logHandleId, ObjectId = targetObjectId, ObjectType = objectType}));
+        _publishEndpoint.Publish(new CreateLogHandle(new LogHandleDto(){LogHandleId = logHandleId, ObjectId = targetObjectId, ObjectType = objectType}));
     }
 }

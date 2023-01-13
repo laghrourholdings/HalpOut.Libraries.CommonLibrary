@@ -81,7 +81,6 @@ public static class StartupExtentions
                 });
         });
         services.AddMassTransitWithRabbitMq();
-        services.AddScoped<ILoggingService, LoggingService>();
         services.AddHttpClient("HttpClient").AddPolicyHandler(
             request => new HttpClientPolicy().LinearHttpRetryPolicy);
         services.AddSingleton<HttpClientPolicy>();
@@ -102,6 +101,12 @@ public static class StartupExtentions
         services.ConfigureOptions<ConfigureSwaggerOptions>();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
+        return services;
+    }
+
+    public static IServiceCollection AddCommonLibraryLoggingService(this IServiceCollection services)
+    {
+        services.AddScoped<ILoggingService, LoggingService>();
         return services;
     }
     public static WebApplication UseCommonLibrary(this WebApplication app, string originName)
