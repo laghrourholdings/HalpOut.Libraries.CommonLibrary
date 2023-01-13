@@ -1,37 +1,25 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CommonLibrary.Logging.Models;
+﻿namespace CommonLibrary.Logging.Models.Dtos;
 
 /// <summary>
 /// The LogHandle class is the default implementation of the ILogHandle
 /// The LogMessage is used as the type parameter for ILogMessage
 /// </summary>
 
-public class LogHandle : ILogHandle<LogMessage,List<LogMessage>>, IEquatable<LogHandle>
+public class LogHandleDto //: ILogHandle<LogMessage,List<LogMessage>>, IEquatable<LogHandle>
 {
-    [Key]
-    public int Id { get; set; }
-    public Guid LogHandleId { get; set; }
+    public Guid Id { get; set; }
     public Guid ObjectId { get; set; }
     public DateTimeOffset CreationDate { get; set; }
-    public bool IsDeleted { get; set; }
-    public bool IsSuspended { get; set; }
-    public DateTimeOffset DeletedDate { get; set; }
-    public Guid DeletedBy { get; set; }
-    public DateTimeOffset SuspendedDate { get; set; }
-    public Guid SuspendedBy { get; set; }
     public string ObjectType { get; set; }
     public string? LocationDetails { get; set; }
     public string? AuthorizationDetails { get; set; }
     public string? Descriptor { get; set; }
-
-    public List<LogMessage>? Messages { get; set; }
-
-    public bool Equals(LogHandle? other)
+    public ICollection<LogMessageDto> Messages { get; set; } = new HashSet<LogMessageDto>();
+    public bool Equals(LogHandleDto? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return LogHandleId.Equals(other.LogHandleId) && ObjectId.Equals(other.ObjectId);
+        return Id.Equals(other.Id) && ObjectId.Equals(other.ObjectId);
     }
 
     public override bool Equals(object? obj)
@@ -39,11 +27,11 @@ public class LogHandle : ILogHandle<LogMessage,List<LogMessage>>, IEquatable<Log
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
-        return Equals((LogHandle)obj);
+        return Equals((LogHandleDto)obj);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(LogHandleId, ObjectId);
+        return HashCode.Combine(Id, ObjectId);
     }
 }

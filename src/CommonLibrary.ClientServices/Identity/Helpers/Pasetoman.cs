@@ -3,22 +3,20 @@ using Paseto.Builder;
 
 namespace CommonLibrary.ClientServices.Identity.Helpers;
 
-public static class Paseman
+public static class Pasetoman
 {
-
     public static PasetoTokenValidationResult VerifyToken(
         string token,
         byte[] publicKey,
         PasetoTokenValidationParameters? parameters = null, ProtocolVersion version = ProtocolVersion.V4)
     {
-        var builder = new PasetoBuilder()
+        
+        
+        var result = new PasetoBuilder()
             .Use(version, Purpose.Public)
-            .WithPublicKey(publicKey);
-        PasetoTokenValidationResult result;
-        if (parameters != null)
-            result = builder.Decode(token, parameters);
-        else
-            result = builder.Decode(token);
+            .WithPublicKey(publicKey)
+            .Decode(token, parameters);
+       
         return result;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace CommonLibrary.AspNetCore.Identity.Models;
+﻿namespace AuthService.Identity.Models;
 
 public static class UserClaimTypes
 {

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using CommonLibrary.AspNetCore.Settings;
 using CommonLibrary.Logging;
-using CommonLibrary.Logging.Models;
+using CommonLibrary.Logging.Models.Dtos;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -33,16 +33,14 @@ public static class LogMessageExtentions
     /// <param name="severity">Log level</param>
     /// <param name="logHandleId">Id of the log handle at which the message is attached to</param>
     /// <param name="message">Log message</param>
-    public static LogMessage GetLogMessage(IConfiguration configuration, LogLevel severity, Guid logHandleId, string message )
+    public static LogMessageDto GetLogMessageDto(IConfiguration configuration, LogLevel severity, Guid logHandleId, string message )
     {
         ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
-        return new LogMessage
+        return new LogMessageDto
         {
-            Id = Guid.NewGuid(),
             CreationDate = DateTimeOffset.Now,
             LogHandleId = logHandleId,
-            /*Descriptor = $"{DateTimeOffset.Now} | {serviceSettings.ServiceName} | {message}",*/
-            Descriptor = $"{serviceSettings.ServiceName} | {message}",
+            Message = $"{serviceSettings.ServiceName} | {message}",
             Severity = severity
         };
     }
@@ -54,23 +52,15 @@ public static class LogMessageExtentions
     /// <param name="configuration">An IConfiguration instance provided by DI for the current microservice</param>
     /// <param name="severity">Log level</param>
     /// <param name="message">Log message</param>
-    public static LogMessage AttachLogMessage(this LogHandle logHandle, IConfiguration configuration, LogLevel severity, string message )
+    public static LogMessageDto AttachLogMessage(this LogHandleDto logHandle, IConfiguration configuration, LogLevel severity, string message )
     {
-        ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
-        var logMessage = new LogMessage
-        {
-            Id = Guid.NewGuid(),
-            CreationDate = DateTimeOffset.Now,
-            LogHandleId = logHandle.LogHandleId,
-            /*Descriptor = $"{DateTimeOffset.Now} | {serviceSettings.ServiceName} | {message}",*/
-            Descriptor = $"{serviceSettings.ServiceName} | {message}",
-            Severity = severity
-        };
+        var logMessage = GetLogMessageDto(configuration, severity, logHandle.Id, message);
+        
         if (logHandle.Messages != null) 
             logHandle.Messages.Add(logMessage);
         else
         {
-            logHandle.Messages = new List<LogMessage>();
+            logHandle.Messages = new List<LogMessageDto>();
             logHandle.Messages.Add(logMessage);
         }
 
@@ -114,7 +104,7 @@ public static class LogMessageExtentions
     public static void PublishLogMessage
         (this IPublishEndpoint publishEndpoint, IConfiguration configuration, LogLevel severity, Guid logHandleId, string message) 
     {
-        var logMessage = GetLogMessage(configuration, severity, logHandleId, message);
+        var logMessage = GetLogMessageDto(configuration, severity, logHandleId, message);
         // var serviceBusPayload = new ServiceBusPayload<LogMessage>
         // {
         //     Subject = logMessage,
