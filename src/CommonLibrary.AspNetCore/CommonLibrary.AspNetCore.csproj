@@ -40,7 +40,6 @@
     </ItemGroup>
     
     <ItemGroup>
-      <Folder Include="Identity\Models\Dtos" />
       <Folder Include="Logging\Enrichers" />
       <Folder Include="Logging\Interfaces" />
       <Folder Include="MassTransit\Implementations" />
