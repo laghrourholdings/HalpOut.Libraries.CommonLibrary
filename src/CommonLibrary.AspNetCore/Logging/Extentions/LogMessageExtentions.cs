@@ -33,13 +33,12 @@ public static class LogMessageExtentions
     /// <param name="severity">Log level</param>
     /// <param name="logHandleId">Id of the log handle at which the message is attached to</param>
     /// <param name="message">Log message</param>
-    public static LogMessageDto GetLogMessageDto(IConfiguration configuration, LogLevel severity, Guid logHandleId, string message )
+    public static LogMessageDto GetLogMessageDto(IConfiguration configuration, LogLevel severity, string message )
     {
         ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
         return new LogMessageDto
         {
             CreationDate = DateTimeOffset.Now,
-            LogHandleId = logHandleId,
             Message = $"{serviceSettings.ServiceName} | {message}",
             Severity = severity
         };
@@ -52,7 +51,7 @@ public static class LogMessageExtentions
     /// <param name="configuration">An IConfiguration instance provided by DI for the current microservice</param>
     /// <param name="severity">Log level</param>
     /// <param name="message">Log message</param>
-    public static LogMessageDto AttachLogMessage(this LogHandleDto logHandle, IConfiguration configuration, LogLevel severity, string message )
+    /*public static LogMessageDto AttachLogMessage(this LogHandleDto logHandle, IConfiguration configuration, LogLevel severity, string message )
     {
         var logMessage = GetLogMessageDto(configuration, severity, logHandle.Id, message);
         
@@ -78,7 +77,7 @@ public static class LogMessageExtentions
             Descriptor = $"{serviceSettings.ServiceName} | {message}",
             Severity = severity
         };
-    }
+    }*/
     
     /*public static ServiceBusPayload<TLogMessage> GetContract<TLogMessage>
         (IConfiguration configuration, LogLevel severity, Guid logHandleId, string message) where TLogMessage : ILogMessage, new()
@@ -104,14 +103,14 @@ public static class LogMessageExtentions
     public static void PublishLogMessage
         (this IPublishEndpoint publishEndpoint, IConfiguration configuration, LogLevel severity, Guid logHandleId, string message) 
     {
-        var logMessage = GetLogMessageDto(configuration, severity, logHandleId, message);
+        var logMessage = GetLogMessageDto(configuration, severity, message);
         // var serviceBusPayload = new ServiceBusPayload<LogMessage>
         // {
         //     Subject = logMessage,
         //     Contract = nameof(CreateLogMessage),
         //     Descriptor = $"Creation of LogMessage {logMessage.Id}"
         // };
-        publishEndpoint.Publish(new CreateLogMessage(logMessage));
+        publishEndpoint.Publish(new CreateLogMessage(logMessage, logHandleId));
     }
 
 

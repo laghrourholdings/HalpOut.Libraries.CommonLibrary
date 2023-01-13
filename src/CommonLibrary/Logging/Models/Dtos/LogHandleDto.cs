@@ -7,7 +7,7 @@
 
 public class LogHandleDto //: ILogHandle<LogMessage,List<LogMessage>>, IEquatable<LogHandle>
 {
-    public Guid Id { get; set; }
+    public Guid LogHandleId { get; set; }
     public Guid ObjectId { get; set; }
     public DateTimeOffset CreationDate { get; set; }
     public string ObjectType { get; set; }
@@ -19,7 +19,7 @@ public class LogHandleDto //: ILogHandle<LogMessage,List<LogMessage>>, IEquatabl
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return Id.Equals(other.Id) && ObjectId.Equals(other.ObjectId);
+        return LogHandleId.Equals(other.LogHandleId) && ObjectId.Equals(other.ObjectId);
     }
 
     public override bool Equals(object? obj)
@@ -32,6 +32,6 @@ public class LogHandleDto //: ILogHandle<LogMessage,List<LogMessage>>, IEquatabl
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Id, ObjectId);
+        return HashCode.Combine(LogHandleId, ObjectId);
     }
 }

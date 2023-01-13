@@ -7,7 +7,6 @@ namespace CommonLibrary.Logging.Models.Dtos;
 /// </summary>
 public class LogMessageDto //: ILogMessage, IEquatable<LogMessage>
 {
-    public Guid LogHandleId { get; set; }
     public DateTimeOffset CreationDate { get; set; }
     public LogLevel Severity { get; set; }
     public string Message { get; set; }
@@ -16,7 +15,7 @@ public class LogMessageDto //: ILogMessage, IEquatable<LogMessage>
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return LogHandleId.Equals(other.LogHandleId) && CreationDate.Equals(other.CreationDate) && Severity == other.Severity && Message == other.Message;
+        return  CreationDate.Equals(other.CreationDate) && Severity == other.Severity && Message == other.Message;
     }
 
     public override bool Equals(object? obj)
@@ -29,6 +28,6 @@ public class LogMessageDto //: ILogMessage, IEquatable<LogMessage>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(LogHandleId, CreationDate, (int)Severity, Message);
+        return HashCode.Combine(CreationDate, (int)Severity, Message);
     }
 }
