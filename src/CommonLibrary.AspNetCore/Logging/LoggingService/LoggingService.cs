@@ -1,4 +1,5 @@
 ﻿using CommonLibrary.AspNetCore.ServiceBus.Contracts.Logging;
+using CommonLibrary.Logging.Models.Dtos;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 
@@ -108,6 +109,6 @@ public class LoggingService : ILoggingService
     /// </summary>
     public void CreateLogHandle(Guid logHandleId, Guid targetObjectId, string objectType)
     { 
-        _publishEndpoint.Publish(new CreateLogHandle(logHandleId, targetObjectId, objectType));
+        _publishEndpoint.Publish(new CreateLogHandle(new LogHandleDto(){Id = logHandleId, ObjectId = targetObjectId, ObjectType = objectType}));
     }
 }
