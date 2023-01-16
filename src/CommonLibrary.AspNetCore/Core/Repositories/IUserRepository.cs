@@ -1,6 +1,6 @@
 ﻿using CommonLibrary.Core;
 
-namespace CommonLibrary.AspNetCore;
+namespace CommonLibrary.AspNetCore.Core;
 
 public interface IUserRepository<T> : IRepository<T>
 {

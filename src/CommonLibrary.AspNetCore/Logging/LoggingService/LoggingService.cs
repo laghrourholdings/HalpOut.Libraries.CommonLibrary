@@ -1,9 +1,8 @@
-﻿using CommonLibrary.AspNetCore.ServiceBus.Contracts.Logging;
-using CommonLibrary.Logging.Models.Dtos;
+﻿using CommonLibrary.Logging.Models.Dtos;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 
-namespace CommonLibrary.AspNetCore.Logging.LoggingService;
+namespace CommonLibrary.AspNetCore.Logging;
 
 public class LoggingService : ILoggingService
 {

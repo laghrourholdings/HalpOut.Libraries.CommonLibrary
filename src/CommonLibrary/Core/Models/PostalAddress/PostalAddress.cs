@@ -1,4 +1,4 @@
-namespace CommonLibrary.Core.Models.PostalAddress
+namespace CommonLibrary.Core.PostalAddress
 {
     public class PostalAddress : IObject, IDeletable, ISuspendable
     {

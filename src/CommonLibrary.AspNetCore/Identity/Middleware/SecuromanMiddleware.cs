@@ -1,8 +1,8 @@
-﻿using CommonLibrary.AspNetCore.Logging.LoggingService;
+﻿using CommonLibrary.AspNetCore.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace CommonLibrary.AspNetCore.Identity.Middleware;
+namespace CommonLibrary.AspNetCore.Identity;
 
 
 public class SecuromanMiddleware

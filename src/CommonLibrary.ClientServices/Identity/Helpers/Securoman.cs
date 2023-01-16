@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using AuthService.Identity.Models;
+using CommonLibrary.Identity.Models;
 using Paseto;
 
 namespace CommonLibrary.ClientServices.Identity.Helpers;

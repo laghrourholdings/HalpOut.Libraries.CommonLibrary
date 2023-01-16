@@ -1,4 +1,4 @@
-﻿namespace AuthService.Identity.Models;
+﻿namespace CommonLibrary.Identity.Models;
 
 public static class UserClaimTypes
 {

@@ -1,6 +1,5 @@
-﻿using CommonLibrary.AspNetCore.ServiceBus.Contracts.Logging;
+﻿using CommonLibrary.AspNetCore.Core;
 using Microsoft.Extensions.Configuration;
-using CommonLibrary.AspNetCore.Settings;
 using CommonLibrary.Logging;
 using CommonLibrary.Logging.Models.Dtos;
 using MassTransit;
