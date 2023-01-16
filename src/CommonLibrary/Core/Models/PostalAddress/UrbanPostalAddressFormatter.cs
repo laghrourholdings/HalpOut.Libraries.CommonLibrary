@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace CommonLibrary.Core.Models.PostalAddress
+namespace CommonLibrary.Core.PostalAddress
 {
     public class UrbanPostalAddressFormatter : IPostalAddressFormatter
     {

@@ -1,5 +1,5 @@
 
-namespace CommonLibrary.Core.Models.PostalAddress
+namespace CommonLibrary.Core.PostalAddress
 {
     public abstract class PostalAddressConverter<T>
     {

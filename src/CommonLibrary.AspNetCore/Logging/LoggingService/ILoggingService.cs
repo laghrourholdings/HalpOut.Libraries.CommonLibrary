@@ -1,4 +1,4 @@
-﻿namespace CommonLibrary.AspNetCore.Logging.LoggingService;
+﻿namespace CommonLibrary.AspNetCore.Logging;
 
 public interface ILoggingService
 {

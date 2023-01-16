@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace CommonLibrary.Core.Models.PostalAddress
+namespace CommonLibrary.Core.PostalAddress
 {
     public static class ExpressionExtensions
     {

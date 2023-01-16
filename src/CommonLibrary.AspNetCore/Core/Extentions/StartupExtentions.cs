@@ -1,9 +1,8 @@
-﻿using CommonLibrary.AspNetCore.Configurations;
+﻿using System.Reflection;
+using CommonLibrary.AspNetCore.Core.Configurations;
+using CommonLibrary.AspNetCore.Core.Policies;
 using CommonLibrary.AspNetCore.Logging;
-using CommonLibrary.AspNetCore.Logging.LoggingService;
-using CommonLibrary.AspNetCore.MassTransit;
-using CommonLibrary.AspNetCore.Policies;
-using CommonLibrary.AspNetCore.Settings;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace CommonLibrary.AspNetCore;
+namespace CommonLibrary.AspNetCore.Core;
 /*[ApiController]
 [Route("[controller]")]
 public class RequestController : ControllerBase
@@ -80,7 +79,6 @@ public static class StartupExtentions
                     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
         });
-        services.AddMassTransitWithRabbitMq();
         services.AddHttpClient("HttpClient").AddPolicyHandler(
             request => new HttpClientPolicy().LinearHttpRetryPolicy);
         services.AddSingleton<HttpClientPolicy>();
@@ -98,6 +96,7 @@ public static class StartupExtentions
             setup.GroupNameFormat = "'v'VVV";
             setup.SubstituteApiVersionInUrl = true;
         });
+        services.AddCommonLibraryRabbitMq();
         services.ConfigureOptions<ConfigureSwaggerOptions>();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
@@ -109,13 +108,37 @@ public static class StartupExtentions
         services.AddScoped<ILoggingService, LoggingService>();
         return services;
     }
+    public static IServiceCollection AddCommonLibraryRabbitMq(this IServiceCollection services, params IConsumer[] additionalConsumers)
+    {
+        services.AddMassTransit(config =>
+        {
+            config.AddConsumers(Assembly.GetEntryAssembly());
+            foreach (var consumerType in additionalConsumers)
+            {
+                config.AddConsumer(consumerType.GetType());
+            }
+            config.UsingRabbitMq((context, configurator) =>
+            {
+                var configuration = context.GetService<IConfiguration>();
+                ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
+                RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
+                configurator.Host(rabbitMQSettings.Host);
+                configurator.ConfigureEndpoints(context,
+                    new KebabCaseEndpointNameFormatter(serviceSettings.ServiceName, false));
+                configurator.UseMessageRetry(retryConfigurator =>
+                {
+                    retryConfigurator.Interval(10, TimeSpan.FromSeconds(3));
+                });
+            });
+        });
+
+        return services;
+    }
     public static WebApplication UseCommonLibrary(this WebApplication app, string originName)
     {
 
         app.UseHttpsRedirection();
         app.UseCors(originName);
-
-
         app.MapControllers();
         return app;
     }

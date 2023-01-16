@@ -7,7 +7,7 @@ using Paseto.Builder;
 using Paseto.Cryptography.Key;
 using Paseto.Protocol;
 
-namespace CommonLibrary.AspNetCore.Identity.Helpers;
+namespace CommonLibrary.AspNetCore.Identity;
 
 public static class Pasetoman
 {

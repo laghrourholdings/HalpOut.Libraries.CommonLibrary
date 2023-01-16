@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 using CommonLibrary.Core;
 using CommonLibrary.Logging.Models.Dtos;
-using CommonLibrary.Settings;
 using Flurl;
 using Flurl.Http;
 
