@@ -3,5 +3,5 @@
 namespace CommonLibrary.AspNetCore.Identity;
 
 //public record UserCreated(IServiceBusPayload<User> Payload);
-public record UserCreated(Guid UserId, Guid LogHandleId);
+public record UserCreated(UserBadge UserBadge);
 public record CreateUser(UserCredentialsDto CredentialsDto);

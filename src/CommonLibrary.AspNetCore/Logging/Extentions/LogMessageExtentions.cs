@@ -1,6 +1,5 @@
 ﻿using CommonLibrary.AspNetCore.Core;
 using Microsoft.Extensions.Configuration;
-using CommonLibrary.Logging;
 using CommonLibrary.Logging.Models.Dtos;
 using MassTransit;
 using Microsoft.Extensions.Logging;

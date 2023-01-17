@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using CommonLibrary.AspNetCore.Core.Configurations;
 using CommonLibrary.AspNetCore.Core.Policies;
+using CommonLibrary.AspNetCore.Identity;
 using CommonLibrary.AspNetCore.Logging;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -108,6 +109,11 @@ public static class StartupExtentions
         services.AddScoped<ILoggingService, LoggingService>();
         return services;
     }
+    public static IServiceCollection AddCommonLibrarySecuroman(this IServiceCollection services) 
+    {
+        services.AddSingleton<ISecuromanService, SecuromanService>();
+        return services;
+    }
     public static IServiceCollection AddCommonLibraryRabbitMq(this IServiceCollection services, params IConsumer[] additionalConsumers)
     {
         services.AddMassTransit(config =>
@@ -136,10 +142,14 @@ public static class StartupExtentions
     }
     public static WebApplication UseCommonLibrary(this WebApplication app, string originName)
     {
-
         app.UseHttpsRedirection();
         app.UseCors(originName);
         app.MapControllers();
+        return app;
+    }
+    public static WebApplication UseCommonLibrarySecuroman(this WebApplication app)
+    {
+        app.UseMiddleware<SecuromanMiddleware>();
         return app;
     }
 }
