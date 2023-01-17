@@ -6,12 +6,12 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <Copyright>Laghrour Holdings</Copyright>
-        <PackageId>LH.ForYou.CommonLibrary.ClientServices</PackageId>
+        <PackageId>LaghrourHoldings.HalpOut.CommonLibrary.ClientServices</PackageId>
         <Authors>Laghrour Holdings</Authors>
         <Company>Laghrour Holdings</Company>
-        <Product>ForYou.CommonLibrary.ClientServices</Product>
-        <PackageVersion>1.0.1</PackageVersion>
-        <Version>1.0.1</Version>
+        <Product>LaghrourHoldings.HalpOut.CommonLibrary.ClientServices</Product>
+        <PackageVersion>1.0.0.1</PackageVersion>
+        <Version>1.0.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,5 +28,6 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.8" />
+        <PackageReference Include="LaghrourHoldings.HalpOut.CommonLibrary" Version="1.0.0.1" />
     </ItemGroup>
 </Project>

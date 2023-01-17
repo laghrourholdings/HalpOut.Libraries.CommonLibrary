@@ -6,17 +6,17 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <Copyright>Laghrour Holdings</Copyright>
-        <PackageId>LH.ForYou.CommonLibrary.AspNetCore</PackageId>
+        <PackageId>LaghrourHoldings.HalpOut.CommonLibrary.AspNetCore</PackageId>
         <Authors>Laghrour Holdings</Authors>
         <Company>Laghrour Holdings</Company>
-        <Product>ForYou.CommonLibrary.AspNetCore</Product>
-        <PackageVersion>1.0.4</PackageVersion>
-        <Version>1.0.4</Version>
+        <Product>LaghrourHoldings.HalpOut.CommonLibrary.AspNetCore</Product>
+        <PackageVersion>1.0.0.1</PackageVersion>
+        <Version>1.0.0.1</Version>
     </PropertyGroup>
     
     <ItemGroup>
         <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
-        <PackageReference Include="LH.ForYou.CommonLibrary" Version="1.0.7" />
+        <PackageReference Include="LaghrourHoldings.HalpOut.CommonLibrary" Version="1.0.0.1" />
         <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />

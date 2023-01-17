@@ -6,12 +6,13 @@
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <Copyright>Laghrour Holdings</Copyright>
-        <PackageId>LH.ForYou.CommonLibrary</PackageId>
+        <PackageId>LaghrourHoldings.HalpOut.CommonLibrary</PackageId>
         <Authors>Laghrour Holdings</Authors>
         <Company>Laghrour Holdings</Company>
-        <Product>ForYou.CommonLibrary</Product>
-        <PackageVersion>1.0.7</PackageVersion>
-        <Version>1.0.7</Version>
+        <Product>LaghrourHoldings.HalpOut.CommonLibrary</Product>
+        <PackageVersion>1.0.0.1</PackageVersion>
+        <Version>1.0.0.1</Version>
+        <Title>HalpOut.CommonLibrary</Title>
     </PropertyGroup>
 
     <ItemGroup>
