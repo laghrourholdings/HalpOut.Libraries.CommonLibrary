@@ -53,31 +53,22 @@ public static class Pasetoman
     public static PasetoBuilder CreateTokenPipe(
         string issuer,
         string audience,
-        DateTime expiration)
-    {
-        PasetoSymmetricKey key;
-        
-        return new PasetoBuilder()
+        DateTime expiration) =>
+        new PasetoBuilder()
             .Issuer(issuer)
             .Audience(audience)
+            .NotBefore(DateTime.UtcNow)
             .Expiration(expiration);
-    }
 
     public static PasetoTokenValidationResult VerifyToken(
         string token,
         byte[] publicKey,
-        PasetoTokenValidationParameters? parameters = null, ProtocolVersion version = ProtocolVersion.V4)
-    {
-        
-        
-        var result = new PasetoBuilder()
+        PasetoTokenValidationParameters? parameters = null, ProtocolVersion version = ProtocolVersion.V4) =>
+        new PasetoBuilder()
             .Use(version, Purpose.Public)
             .WithPublicKey(publicKey)
             .Decode(token, parameters);
-       
-        return result;
-    }
-    
+
     /*public static PasetoTokenValidationResult VerifyTokenSignature(
         string token,
         byte[] symmetricKey,

@@ -36,13 +36,14 @@ public class SecuromanMiddleware
                     }
                     else
                     {
-                        var payload = Securoman.GetUnverifiedUserTicket(token);
-                        var loghandleId = payload?.FirstOrDefault(x=>x.Type == UserClaimTypes.LogHandleId)?.Value; 
-                        var userId = payload?.FirstOrDefault(x=>x.Type == ClaimTypes.NameIdentifier)?.Value;
-                        if (loghandleId != null && userId != null)
-                        {
-                            loggingService.Information($"Authentification rejected for user [invalid token]", new Guid(loghandleId));
-                        }
+                        // Refresh token...
+                        // var payload = Securoman.GetUnverifiedUserTicket(token);
+                        // var loghandleId = payload?.FirstOrDefault(x=>x.Type == UserClaimTypes.LogHandleId)?.Value; 
+                        // var userId = payload?.FirstOrDefault(x=>x.Type == ClaimTypes.NameIdentifier)?.Value;
+                        // if (loghandleId != null && userId != null)
+                        // {
+                        //     loggingService.Information($"Authentification rejected for user [invalid token]", new Guid(loghandleId));
+                        // }
                     }
                 }
             }

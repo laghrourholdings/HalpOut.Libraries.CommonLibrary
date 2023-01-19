@@ -16,6 +16,11 @@ public class TokenResult
     {
         Result = result;
     }
+    public TokenResult(bool invalidSecretKey)
+    {
+        HasInvalidSecretKey = invalidSecretKey;
+    }
+    public bool HasInvalidSecretKey { get; }
     public byte[] PublicKey { get; }
-    public IEnumerable<Securoman.TicketClaim> Claims { get; set; }
+    public IEnumerable<Securoman.TicketClaim> Claims { get;}
 }

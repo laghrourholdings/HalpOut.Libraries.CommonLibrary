@@ -158,9 +158,17 @@ public static class Securoman
 
     public static TokenResult VerifyTokenWithSecret(string token, byte[] SymmetryKey, PasetoTokenValidationParameters? paramms = null)
     {
-        var footer = Pasetoman.DecodeFooter(token);
-        var publicKey = DecryptPublicKey(Convert.FromHexString(footer), SymmetryKey);
-       return VerifyToken(token, publicKey, paramms);
+        try
+        {
+            var footer = Pasetoman.DecodeFooter(token); 
+            var publicKey = DecryptPublicKey(Convert.FromHexString(footer), SymmetryKey);
+            if (publicKey == null || publicKey.Length == 0)
+                return new TokenResult(true);
+            return VerifyToken(token, publicKey, paramms);
+        }catch(Exception e)
+        {
+            return new TokenResult(true);
+        }
     }
     
     public static TokenResult VerifyToken(string token, byte[] publicKey, PasetoTokenValidationParameters? paramms = null)
