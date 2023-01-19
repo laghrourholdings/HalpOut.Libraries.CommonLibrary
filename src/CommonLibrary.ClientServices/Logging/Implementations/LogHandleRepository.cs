@@ -8,14 +8,14 @@ namespace CommonLibrary.ClientServices.Logging.Implementations;
 
 public class LogHandleRepository : IRepository<LogHandleDto>
 {
-    public async Task<IEnumerable<LogHandleDto>?> GetAllAsync()
+    public async Task<List<LogHandleDto>?> GetAllAsync()
     {
         return await ServicesSettings.GatewayServiceDevURL
             .AppendPathSegment("admin/logs")
-            .GetJsonAsync<IEnumerable<LogHandleDto>>();
+            .GetJsonAsync<List<LogHandleDto>>();
     }
 
-    public Task<IEnumerable<LogHandleDto>?> GetAllAsync(
+    public Task<List<LogHandleDto>?> GetAllAsync(
         Expression<Func<LogHandleDto, bool>> filter)
     {
         throw new NotImplementedException();
