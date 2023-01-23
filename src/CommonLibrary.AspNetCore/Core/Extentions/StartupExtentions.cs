@@ -63,6 +63,9 @@ public static class StartupExtentions
         services.Configure<ServiceSettings>(configuration.GetSection(nameof(ServiceSettings)));
         ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
         RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
+#if DEBUG
+        Console.Title = serviceSettings.ServiceName;
+#endif
         ILogger logger = loggerConfiguration
             .Enrich.WithEnvironmentName().WriteTo.ServiceBusSink().Enrich.WithProperty("servicename", serviceSettings.ServiceName)
 #if RELEASE

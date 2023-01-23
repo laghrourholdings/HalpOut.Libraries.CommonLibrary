@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using CommonLibrary.Identity.Models;
-using Flurl;
 using Flurl.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
@@ -13,7 +12,8 @@ namespace CommonLibrary.AspNetCore.Identity;
 
 public interface ISecuromanService
 {
-    Task<TokenResult?> Identify(string token);
+    Task<TokenResult?> Authenticate();
+    bool IsAuthenticated();
     Task SetOrUpdateUserAsync(UserBadge badge);
     Task RemoveUserAsync(Guid userId);
     Task<UserBadge?> GetUserFromSecuromanCache(Guid userId);
@@ -65,9 +65,56 @@ public class SecuromanService : ISecuromanService
         return userId != null ? new Guid(userId) : null;
     }
 
-    public async Task<TokenResult?> Identify(string token)
+    public bool IsAuthenticated()
     {
-        var payload = Securoman.GetUnverifiedUserTicket(token);
+        if (_httpContextAccessor.HttpContext == null)
+            return false;
+        
+        return _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier) != null;
+    }
+
+    public async Task<TokenResult?> Authenticate()
+    {
+        if (_httpContextAccessor.HttpContext == null)
+            return null;
+        if (_httpContextAccessor.HttpContext.Request.Cookies.TryGetValue(SecuromanDefaults.SessionCookie, out _)
+            && _httpContextAccessor.HttpContext.Request.Cookies.TryGetValue(SecuromanDefaults.TokenCookie, out var token))
+        {
+            var payload = Securoman.GetUnverifiedUserTicket(token);
+            var userId = payload?.FirstOrDefault(x=>x.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return null;
+            var userBadge = await GetUser(new Guid(userId));
+            if (userBadge == null)
+            {
+                try
+                {
+                    var userBadgerRequest = _securomanUrl
+                        .WithCookies(_httpContextAccessor.HttpContext.Request.Cookies)
+                        .AppendPathSegment("api/v1/auth")
+                        .AppendPathSegment("refreshBadge");
+                    var updatedUserBadge = await userBadgerRequest.GetJsonAsync<UserBadge>();
+                    if (updatedUserBadge == null) return null;
+                    await SetOrUpdateUserAsync(updatedUserBadge);
+                    userBadge = updatedUserBadge;
+                }
+                catch (FlurlHttpException ex)
+                {
+                    return null;
+                }
+            
+            }
+            var verify = Securoman.VerifyTokenWithSecret(token, userBadge.SecretKey);
+            if (!verify.HasInvalidSecretKey)
+            {
+                _httpContextAccessor.HttpContext.User.AddIdentity(new ClaimsIdentity(verify.Claims.Select(x => new Claim(x.Type, x.Value)), "Securoman"));
+                return verify;
+            }
+            await RemoveUserAsync(new Guid(userId));
+            return await Authenticate();
+        }
+
+        return null;
+        /*var payload = Securoman.GetUnverifiedUserTicket(token);
         var userId = payload?.FirstOrDefault(x=>x.Type == ClaimTypes.NameIdentifier)?.Value;
         if (userId == null) return null;
         var userBadge = await GetUser(new Guid(userId));
@@ -75,15 +122,15 @@ public class SecuromanService : ISecuromanService
         {
             try
             {
-                userBadge = await _securomanUrl
-                    //.WithCookies(_httpContextAccessor.HttpContext.Request.Cookies)
-                    //.WithHeader(userAgent)
+                var userBadgerRequest = _securomanUrl
+                    .WithCookies(_httpContextAccessor.HttpContext?.Request.Cookies)
+                    .WithHeader("User-Agent", _httpContextAccessor.HttpContext.Request.Headers["User-Agent"])
                     .AppendPathSegment("api/v1/auth")
-                    .AppendPathSegment("refreshBadge")
-                    .SetQueryParam("token", token)
-                    .GetJsonAsync<UserBadge>();
-                if (userBadge == null) return null;
-                await SetOrUpdateUserAsync(userBadge);
+                    .AppendPathSegment("refreshBadge");
+                var updatedUserBadge = await userBadgerRequest.GetJsonAsync<UserBadge>();
+                if (updatedUserBadge == null) return null;
+                await SetOrUpdateUserAsync(updatedUserBadge);
+                userBadge = updatedUserBadge;
             }
             catch (FlurlHttpException ex)
             {
@@ -94,7 +141,7 @@ public class SecuromanService : ISecuromanService
         var verify = Securoman.VerifyTokenWithSecret(token, userBadge.SecretKey);
         if (!verify.HasInvalidSecretKey) return verify;
         await RemoveUserAsync(new Guid(userId));
-        return await Identify(token);
+        return await Identify(token);*/
     }
 
     public Task SetOrUpdateUserAsync(UserBadge badge)
