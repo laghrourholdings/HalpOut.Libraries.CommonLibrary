@@ -6,7 +6,7 @@ public class TokenResult
 {
     public PasetoTokenValidationResult Result { get; }
 
-    public TokenResult(PasetoTokenValidationResult result, byte[] publicKey, IEnumerable<Securoman.TicketClaim> claims)
+    public TokenResult(PasetoTokenValidationResult result, byte[] publicKey, IEnumerable<Securoman.UserClaim> claims)
     {
         Result = result;
         PublicKey = publicKey;
@@ -22,5 +22,5 @@ public class TokenResult
     }
     public bool HasInvalidSecretKey { get; }
     public byte[] PublicKey { get; }
-    public IEnumerable<Securoman.TicketClaim> Claims { get;}
+    public IEnumerable<Securoman.UserClaim> Claims { get;}
 }

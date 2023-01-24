@@ -4,6 +4,7 @@ using CommonLibrary.AspNetCore.Core.Policies;
 using CommonLibrary.AspNetCore.Identity;
 using CommonLibrary.AspNetCore.Logging;
 using MassTransit;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
@@ -59,10 +60,9 @@ public static class StartupExtentions
         services.AddHttpContextAccessor();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         logging.ClearProviders();
-        services.Configure<RabbitMQSettings>(configuration.GetSection(nameof(RabbitMQSettings)));
         services.Configure<ServiceSettings>(configuration.GetSection(nameof(ServiceSettings)));
         ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
-        RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
+        //RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
 #if DEBUG
         Console.Title = serviceSettings.ServiceName;
 #endif
@@ -112,11 +112,7 @@ public static class StartupExtentions
         services.AddScoped<ILoggingService, LoggingService>();
         return services;
     }
-    public static IServiceCollection AddCommonLibrarySecuroman(this IServiceCollection services) 
-    {
-        services.AddSingleton<ISecuromanService, SecuromanService>();
-        return services;
-    }
+    
     public static IServiceCollection AddCommonLibraryRabbitMq(this IServiceCollection services, params IConsumer[] additionalConsumers)
     {
         services.AddMassTransit(config =>
@@ -129,9 +125,8 @@ public static class StartupExtentions
             config.UsingRabbitMq((context, configurator) =>
             {
                 var configuration = context.GetService<IConfiguration>();
-                ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
-                RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
-                configurator.Host(rabbitMQSettings.Host);
+                ServiceSettings serviceSettings = configuration?.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
+                configurator.Host(serviceSettings.MessageBus?.Host);
                 configurator.ConfigureEndpoints(context,
                     new KebabCaseEndpointNameFormatter(serviceSettings.ServiceName, false));
                 configurator.UseMessageRetry(retryConfigurator =>
@@ -150,9 +145,19 @@ public static class StartupExtentions
         app.MapControllers();
         return app;
     }
+    public static IServiceCollection AddCommonLibrarySecuroman(this IServiceCollection services) 
+    {
+        services.AddSingleton<ISecuromanService, SecuromanService>();
+        services.AddScoped<AuthenticationHandler<SecuromanAuthenticationOptions>,SecuromanAuthenticationHandler>();
+        services.AddAuthentication(SecuromanAuthenticationHandler.SchemaName)
+            .AddScheme<SecuromanAuthenticationOptions, SecuromanAuthenticationHandler>(SecuromanAuthenticationHandler.SchemaName, null);
+        return services;
+    }
     public static WebApplication UseCommonLibrarySecuroman(this WebApplication app)
     {
-        app.UseMiddleware<SecuromanMiddleware>();
+        //app.UseMiddleware<SecuromanMiddleware>();
+        app.UseAuthentication();
+        app.UseAuthorization();
         return app;
     }
 }

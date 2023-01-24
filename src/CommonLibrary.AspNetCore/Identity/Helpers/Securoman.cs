@@ -14,7 +14,25 @@ namespace CommonLibrary.AspNetCore.Identity;
 
 public static class Securoman
 {
-    public record TicketClaim(string Type, string Value);
+    public record UserClaim(string Type, string Value, string Issuer);
+    public class AuthenticateResult
+    {
+        public bool Succeeded { get;}
+        public string? ErrorMessage { get; }
+        public RolePrincipal? RolePrincipal { get; }
+        public IEnumerable<Claim>? Claims { get;}
+        public AuthenticateResult(string errorMessage)
+        {
+            Succeeded = false;
+            ErrorMessage = errorMessage;
+        }
+        public AuthenticateResult(RolePrincipal rolePrincipal, IEnumerable<Claim> claims)
+        {
+            Succeeded = true;
+            RolePrincipal = rolePrincipal;
+            Claims = claims;
+        }
+    }
     public static PasetoTokenValidationParameters DefaultParameters { get; } = new PasetoTokenValidationParameters
     {
         ValidateLifetime = true,
@@ -141,6 +159,7 @@ public static class Securoman
         PasetoAsymmetricKeyPair keyPair,
         IEnumerable<Claim> claims,
         byte [] symmetricKey,
+        Guid sessionId,
         DateTimeOffset exp)
     {
         var publicKey = keyPair.PublicKey.Key.ToArray();
@@ -148,8 +167,8 @@ public static class Securoman
         
         //TODO refactor to not have hardcoded stuff
         var tokenBuilder = Pasetoman.CreateTokenPipe("auth.laghrour.com","laghrour.com",exp.DateTime);
-        //tokenBuilder.AddClaim(UserClaimTypes.UserSessionId, sessionId.ToString());
-        tokenBuilder.AddClaim(UserClaimTypes.UserTicket, JsonSerializer.Serialize(claims.Select(x => new TicketClaim(x.Type,x.Value))));
+        tokenBuilder.AddClaim(UserClaimTypes.UserSessionId, sessionId.ToString());
+        tokenBuilder.AddClaim(UserClaimTypes.UserTicket, JsonSerializer.Serialize(claims.Select(x => new UserClaim(x.Type,x.Value, x.Issuer))));
         tokenBuilder.AddFooter(EncryptPublicKey(publicKey, symmetricKey));
         
         
@@ -174,20 +193,31 @@ public static class Securoman
     public static TokenResult VerifyToken(string token, byte[] publicKey, PasetoTokenValidationParameters? paramms = null)
     {
         var result = Pasetoman.VerifyToken(token, publicKey, paramms ?? DefaultParameters);
-        if (result.IsValid && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserTicket, out var ticket))
+        if (result.IsValid 
+            && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserTicket, out var ticket)
+            && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserSessionId, out var sessionId))
         {
-            var claims = JsonSerializer.Deserialize<IEnumerable<TicketClaim>>(ticket.ToString());
+            var claims = new List<UserClaim>();
+            claims.Add(new UserClaim(UserClaimTypes.UserSessionId, sessionId.ToString(), "UserService"));
+            claims.AddRange(JsonSerializer.Deserialize<IEnumerable<UserClaim>>(ticket.ToString()));
             return new TokenResult(result, publicKey, claims);
         }
         return new TokenResult(result);
     }
 
-    public static IEnumerable<TicketClaim>? GetUnverifiedUserTicket(string token)
+    public static IEnumerable<UserClaim>? GetUnverifiedUserTicket(string token)
     {
         var payload = UnsecurePayloadDecode(token);
         if (payload is null) return null;
-        return payload.TryGetValue(UserClaimTypes.UserTicket, out var ticket) 
-            ? JsonSerializer.Deserialize<IEnumerable<TicketClaim>>(ticket.ToString()) : null;
+        if(payload.TryGetValue(UserClaimTypes.UserTicket, out var ticket) &&
+           payload.TryGetValue(UserClaimTypes.UserSessionId, out var sessionId))
+        {
+            var claims = new List<UserClaim>();
+            claims.Add(new UserClaim(UserClaimTypes.UserSessionId, sessionId.ToString(), "UserService"));
+            claims.AddRange(JsonSerializer.Deserialize<List<UserClaim>>(ticket.ToString()));
+            return claims;
+        }
+        return null;
     }
 
     private static IDictionary<string, object>? UnsecurePayloadDecode(string token)
