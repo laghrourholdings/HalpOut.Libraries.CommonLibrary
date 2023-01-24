@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using CommonLibrary.Identity.Models;
+using DnsClient.Protocol;
 using Flurl.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
@@ -30,6 +31,7 @@ public class SecuromanService : ISecuromanService
     {
         public Guid LogHandleId { get; set; }
         public byte[] SecretKey { get; set; }
+        public RolePrincipal RolePrincipal { get; set; }
     }
 
     public SecuromanService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
@@ -104,9 +106,13 @@ public class SecuromanService : ISecuromanService
             
             }
             var verify = Securoman.VerifyTokenWithSecret(token, userBadge.SecretKey);
-            if (!verify.HasInvalidSecretKey)
+            if (!verify.HasInvalidSecretKey && verify.Result.IsValid)
             {
                 _httpContextAccessor.HttpContext.User.AddIdentity(new ClaimsIdentity(verify.Claims.Select(x => new Claim(x.Type, x.Value)), "Securoman"));
+                _httpContextAccessor.HttpContext.User.AddIdentity(new ClaimsIdentity(userBadge.RolePrincipal.Roles.Select(
+                    x => new Claim(ClaimTypes.Role, x)), "Securoman"));
+                _httpContextAccessor.HttpContext.User.AddIdentity(new ClaimsIdentity(userBadge.RolePrincipal.Permissions.Select(
+                    x => new Claim(x.Type, x.Value,x.Issuer)), "Securoman"));
                 return verify;
             }
             await RemoveUserAsync(new Guid(userId));
@@ -167,7 +173,8 @@ public class SecuromanService : ISecuromanService
         {
             LogHandleId = userBadgeCacheData.LogHandleId,
             SecretKey = userBadgeCacheData.SecretKey,
-            UserId = userId
+            UserId = userId,
+            RolePrincipal = userBadgeCacheData.RolePrincipal
         };
     }
     
@@ -182,7 +189,8 @@ public class SecuromanService : ISecuromanService
         return new UserBadge()
         {
             LogHandleId = userBadgeCacheData.LogHandleId, 
-            UserId = userId
+            UserId = userId,
+            RolePrincipal = userBadgeCacheData.RolePrincipal
         };
     }
     
@@ -191,7 +199,8 @@ public class SecuromanService : ISecuromanService
         var badgeStore = new UserBadgeCacheData()
         {
             LogHandleId = badge.LogHandleId,
-            SecretKey = badge.SecretKey
+            SecretKey = badge.SecretKey,
+            RolePrincipal = badge.RolePrincipal
         };
         return Encoding.UTF8.GetBytes(JsonSerializer.Serialize(badgeStore));
     }

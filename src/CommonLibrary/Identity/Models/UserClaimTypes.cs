@@ -7,6 +7,7 @@ public static class UserClaimTypes
     public static string UserInterestId = "UserInterestId";
     public static string UserSessionId = "sid";
     public static string LogHandleId = "LogHandleId";
-    public static string Previlege = "Previlege";
+    public static string Rights = "Rights";
+    public static string Privilege = "Privilege";
     public static string UserType = "UserType";
 }

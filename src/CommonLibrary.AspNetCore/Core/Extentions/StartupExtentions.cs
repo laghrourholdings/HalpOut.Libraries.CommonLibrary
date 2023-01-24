@@ -59,10 +59,9 @@ public static class StartupExtentions
         services.AddHttpContextAccessor();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         logging.ClearProviders();
-        services.Configure<RabbitMQSettings>(configuration.GetSection(nameof(RabbitMQSettings)));
         services.Configure<ServiceSettings>(configuration.GetSection(nameof(ServiceSettings)));
         ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
-        RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
+        //RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
 #if DEBUG
         Console.Title = serviceSettings.ServiceName;
 #endif
@@ -129,9 +128,9 @@ public static class StartupExtentions
             config.UsingRabbitMq((context, configurator) =>
             {
                 var configuration = context.GetService<IConfiguration>();
-                ServiceSettings serviceSettings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
-                RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
-                configurator.Host(rabbitMQSettings.Host);
+                ServiceSettings serviceSettings = configuration?.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>() ?? throw new InvalidOperationException("ServiceSettings is null");
+                //RabbitMQSettings rabbitMQSettings = configuration.GetSection(nameof(RabbitMQSettings)).Get<RabbitMQSettings>() ?? throw new InvalidOperationException("RabbitMQSettings is null");
+                configurator.Host(serviceSettings.MessageBus?.Host);
                 configurator.ConfigureEndpoints(context,
                     new KebabCaseEndpointNameFormatter(serviceSettings.ServiceName, false));
                 configurator.UseMessageRetry(retryConfigurator =>

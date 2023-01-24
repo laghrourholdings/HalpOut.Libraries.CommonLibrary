@@ -1,4 +1,4 @@
-﻿namespace CommonLibrary.ClientServices.Settings;
+﻿namespace CommonLibrary.ClientServices.Core;
 
 public class ServiceSettings
 {
