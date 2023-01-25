@@ -2,6 +2,7 @@
 using CommonLibrary.AspNetCore.Core.Configurations;
 using CommonLibrary.AspNetCore.Core.Policies;
 using CommonLibrary.AspNetCore.Identity;
+using CommonLibrary.AspNetCore.Identity.Consumers;
 using CommonLibrary.AspNetCore.Logging;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
@@ -55,7 +56,8 @@ public static class StartupExtentions
     /// <param name="loggerConfiguration">ILoggerConfiguration binded with Serilog's ILogger</param>
     /// <param name="originName">Name of the CORS origin policy (defaulted to none)</param>
     public static IServiceCollection AddCommonLibrary(this IServiceCollection services,
-        IConfiguration configuration, ILoggingBuilder logging, LoggerConfiguration loggerConfiguration , string originName)
+        IConfiguration configuration, ILoggingBuilder logging, LoggerConfiguration loggerConfiguration
+        , string originName, bool withSecuroman = true, bool withLogging = true)
     {
         services.AddHttpContextAccessor();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -100,28 +102,30 @@ public static class StartupExtentions
             setup.GroupNameFormat = "'v'VVV";
             setup.SubstituteApiVersionInUrl = true;
         });
-        services.AddCommonLibraryRabbitMq();
+        services.AddCommonLibraryRabbitMq(withSecuroman);
+        if (withSecuroman)
+            services.AddCommonLibrarySecuroman();
+        if (withLogging)
+            services.AddCommonLibraryLoggingService();
         services.ConfigureOptions<ConfigureSwaggerOptions>();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         return services;
     }
 
-    public static IServiceCollection AddCommonLibraryLoggingService(this IServiceCollection services)
+    private static IServiceCollection AddCommonLibraryLoggingService(this IServiceCollection services)
     {
         services.AddScoped<ILoggingService, LoggingService>();
         return services;
     }
     
-    public static IServiceCollection AddCommonLibraryRabbitMq(this IServiceCollection services, params IConsumer[] additionalConsumers)
+    private static IServiceCollection AddCommonLibraryRabbitMq(this IServiceCollection services, bool withSecuroman = true)
     {
         services.AddMassTransit(config =>
         {
             config.AddConsumers(Assembly.GetEntryAssembly());
-            foreach (var consumerType in additionalConsumers)
-            {
-                config.AddConsumer(consumerType.GetType());
-            }
+            if(withSecuroman)
+                config.AddConsumers(typeof(UserInvalidatedConsumer).Assembly);
             config.UsingRabbitMq((context, configurator) =>
             {
                 var configuration = context.GetService<IConfiguration>();
@@ -138,14 +142,16 @@ public static class StartupExtentions
 
         return services;
     }
-    public static WebApplication UseCommonLibrary(this WebApplication app, string originName)
+    public static WebApplication UseCommonLibrary(this WebApplication app, string originName, bool withSecuroman = true)
     {
+        if (withSecuroman)
+            app.UseCommonLibrarySecuroman();
         app.UseHttpsRedirection();
         app.UseCors(originName);
         app.MapControllers();
         return app;
     }
-    public static IServiceCollection AddCommonLibrarySecuroman(this IServiceCollection services) 
+    private static IServiceCollection AddCommonLibrarySecuroman(this IServiceCollection services) 
     {
         services.AddSingleton<ISecuromanService, SecuromanService>();
         services.AddScoped<AuthenticationHandler<SecuromanAuthenticationOptions>,SecuromanAuthenticationHandler>();
@@ -153,7 +159,7 @@ public static class StartupExtentions
             .AddScheme<SecuromanAuthenticationOptions, SecuromanAuthenticationHandler>(SecuromanAuthenticationHandler.SchemaName, null);
         return services;
     }
-    public static WebApplication UseCommonLibrarySecuroman(this WebApplication app)
+    private static WebApplication UseCommonLibrarySecuroman(this WebApplication app)
     {
         //app.UseMiddleware<SecuromanMiddleware>();
         app.UseAuthentication();
