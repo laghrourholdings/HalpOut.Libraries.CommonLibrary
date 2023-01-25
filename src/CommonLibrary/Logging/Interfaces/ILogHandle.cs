@@ -2,7 +2,7 @@
 
 namespace CommonLibrary.Logging;
 
-public interface ILogHandle<TLogMessage,TEnumerable> : IObject, ISuspendable, IDeletable
+public interface ILogHandle<TLogMessage,TEnumerable> : IBusinessObject, ISuspendable, IDeletable
     where TLogMessage : ILogMessage
     where TEnumerable:IEnumerable<TLogMessage>
 {
