@@ -1,6 +1,4 @@
-﻿using CommonLibrary.Logging;
-
-namespace CommonLibrary.AspNetCore.Core;
+﻿namespace CommonLibrary.AspNetCore.Core;
 
  /// <summary>
     /// ServiceSettings provides utility and additionnal services data.

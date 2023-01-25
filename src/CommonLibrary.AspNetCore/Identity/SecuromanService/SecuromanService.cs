@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using CommonLibrary.Identity.Models;
-using DnsClient.Protocol;
 using Flurl.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
@@ -103,7 +102,7 @@ public class SecuromanService : ISecuromanService
         var verify = Securoman.VerifyTokenWithSecret(token, userBadge.SecretKey);
         if (verify.Result.IsValid)
             return new Securoman.AuthenticateResult(userBadge.RolePrincipal,
-                verify.Claims.Select(x => new Claim(x.Type, x.Value, x.Issuer)));
+                verify.Claims.Select(x => new Claim(x.Type, x.Value/*, x.Issuer*/)));
         if (!verify.HasInvalidSecretKey)
             return new Securoman.AuthenticateResult(verify.Result.Exception.Message);
         await RemoveUserAsync(new Guid(userId));
@@ -161,7 +160,7 @@ public class SecuromanService : ISecuromanService
     public Task SetOrUpdateUserAsync(UserBadge badge)
     { 
         var options = new DistributedCacheEntryOptions();
-        options.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(90);
+        options.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7);
         return _cache.SetAsync(badge.UserId.ToString(), SerializeBadgeToBytes(badge), options);
     }
     

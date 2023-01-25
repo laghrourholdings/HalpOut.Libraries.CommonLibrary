@@ -14,7 +14,7 @@ namespace CommonLibrary.AspNetCore.Identity;
 
 public static class Securoman
 {
-    public record UserClaim(string Type, string Value, string Issuer);
+    public record UserClaim(string Type, string Value/*, string Issuer*/);
     public class AuthenticateResult
     {
         public bool Succeeded { get;}
@@ -168,7 +168,7 @@ public static class Securoman
         //TODO refactor to not have hardcoded stuff
         var tokenBuilder = Pasetoman.CreateTokenPipe("auth.laghrour.com","laghrour.com",exp.DateTime);
         tokenBuilder.AddClaim(UserClaimTypes.UserSessionId, sessionId.ToString());
-        tokenBuilder.AddClaim(UserClaimTypes.UserTicket, JsonSerializer.Serialize(claims.Select(x => new UserClaim(x.Type,x.Value, x.Issuer))));
+        tokenBuilder.AddClaim(UserClaimTypes.UserTicket, JsonSerializer.Serialize(claims.Select(x => new UserClaim(x.Type,x.Value/*, x.Issuer*/))));
         tokenBuilder.AddFooter(EncryptPublicKey(publicKey, symmetricKey));
         
         
@@ -198,7 +198,7 @@ public static class Securoman
             && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserSessionId, out var sessionId))
         {
             var claims = new List<UserClaim>();
-            claims.Add(new UserClaim(UserClaimTypes.UserSessionId, sessionId.ToString(), "UserService"));
+            claims.Add(new UserClaim(UserClaimTypes.UserSessionId, sessionId.ToString()/*, "UserService"*/));
             claims.AddRange(JsonSerializer.Deserialize<IEnumerable<UserClaim>>(ticket.ToString()));
             return new TokenResult(result, publicKey, claims);
         }
@@ -213,7 +213,7 @@ public static class Securoman
            payload.TryGetValue(UserClaimTypes.UserSessionId, out var sessionId))
         {
             var claims = new List<UserClaim>();
-            claims.Add(new UserClaim(UserClaimTypes.UserSessionId, sessionId.ToString(), "UserService"));
+            claims.Add(new UserClaim(UserClaimTypes.UserSessionId, sessionId.ToString()/*, "UserService"*/));
             claims.AddRange(JsonSerializer.Deserialize<List<UserClaim>>(ticket.ToString()));
             return claims;
         }

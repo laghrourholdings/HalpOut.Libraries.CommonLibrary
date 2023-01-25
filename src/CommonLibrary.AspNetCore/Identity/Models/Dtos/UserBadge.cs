@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace CommonLibrary.AspNetCore.Identity;
+﻿namespace CommonLibrary.AspNetCore.Identity;
 
 public class UserBadge
 {
