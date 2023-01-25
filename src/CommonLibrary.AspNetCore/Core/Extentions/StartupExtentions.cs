@@ -2,6 +2,7 @@
 using CommonLibrary.AspNetCore.Core.Configurations;
 using CommonLibrary.AspNetCore.Core.Policies;
 using CommonLibrary.AspNetCore.Identity;
+using CommonLibrary.AspNetCore.Identity.Authentication;
 using CommonLibrary.AspNetCore.Identity.Consumers;
 using CommonLibrary.AspNetCore.Logging;
 using MassTransit;

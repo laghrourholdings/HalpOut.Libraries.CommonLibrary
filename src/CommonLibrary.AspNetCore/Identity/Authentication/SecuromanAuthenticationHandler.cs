@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CommonLibrary.AspNetCore.Identity;
+namespace CommonLibrary.AspNetCore.Identity.Authentication;
 
 public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAuthenticationOptions>
     {

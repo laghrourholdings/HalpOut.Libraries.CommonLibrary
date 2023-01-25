@@ -1,6 +1,8 @@
-﻿namespace CommonLibrary.Core;
+﻿using CommonLibrary.Logging;
 
-public interface IUser :  IObject
+namespace CommonLibrary.Core;
+
+public interface IUser :  IBusinessObject
 {
     //TODO 
 }

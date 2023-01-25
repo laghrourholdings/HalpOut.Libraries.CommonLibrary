@@ -6,7 +6,7 @@ public class ObjectProfile : Profile
 {
     public ObjectProfile()
     {
-        // CreateMap<IObject, IIObject>();
-        // CreateMap<IIObject, IObject>();
+        // CreateMap<IBusinessObject, IIObject>();
+        // CreateMap<IIObject, IBusinessObject>();
     }
 }

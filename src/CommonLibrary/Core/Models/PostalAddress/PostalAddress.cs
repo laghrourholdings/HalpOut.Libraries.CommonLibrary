@@ -1,6 +1,8 @@
+using CommonLibrary.Logging;
+
 namespace CommonLibrary.Core.PostalAddress
 {
-    public class PostalAddress : IObject, IDeletable, ISuspendable
+    public class PostalAddress : IBusinessObject, IDeletable, ISuspendable
     {
         public Guid LogHandleId { get; set; }
 
