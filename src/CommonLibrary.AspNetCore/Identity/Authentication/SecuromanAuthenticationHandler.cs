@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
 using System.Security.Principal;
 using System.Text.Encodings.Web;
+using CommonLibrary.AspNetCore.Identity.Roles;
 using Flurl.Http;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -12,7 +12,6 @@ namespace CommonLibrary.AspNetCore.Identity.Authentication;
 public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAuthenticationOptions>
     {
         private readonly ISecuromanService _securomanService;
-        private readonly IConfiguration _config;
         public const  string SchemaName = "Securoman";
 
         public SecuromanAuthenticationHandler(
@@ -20,12 +19,10 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
             ILoggerFactory logger,
             UrlEncoder encoder,
             ISystemClock clock,
-            ISecuromanService securomanService,
-            IConfiguration config)
+            ISecuromanService securomanService)
             : base(options, logger, encoder, clock)
         {
             _securomanService = securomanService;
-            _config = config;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -47,7 +44,7 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
                 var result = await _securomanService.Authenticate(token);
                 if (!result.Succeeded)
                 {
-                    var refreshedToken = await Securoman.GetSecuromanUrl(_config)
+                    var refreshedToken = await _securomanService.GetSecuromanUrl()
                         .WithHeader("User-Agent", Request.Headers.UserAgent)
                         .WithCookies(Request.Cookies)
                         .AppendPathSegment("api/v1/auth")
@@ -64,6 +61,7 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
                 var identity = new ClaimsIdentity(result.Claims, SchemaName);
                 var principal = new GenericPrincipal(identity, result.RolePrincipal.Roles.ToArray());
                 var ticket = new AuthenticationTicket(principal, SchemaName);
+                Context.Items.Add(nameof(RolePrincipal), result.RolePrincipal);
                 return AuthenticateResult.Success(ticket);
             }
             catch (Exception ex)

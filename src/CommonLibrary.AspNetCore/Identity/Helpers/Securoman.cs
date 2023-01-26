@@ -2,11 +2,8 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using CommonLibrary.AspNetCore.Core;
+using CommonLibrary.AspNetCore.Identity.Roles;
 using CommonLibrary.Identity.Models;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Redis;
-using Microsoft.Extensions.Configuration;
 using Paseto;
 using Paseto.Cryptography.Key;
 
@@ -41,13 +38,7 @@ public static class Securoman
         ValidAudience = "laghrour.com",
         ValidIssuer = "auth.laghrour.com"
     };
-    public static IDistributedCache GetSecuromanCache(IConfiguration configuration)
-        => new RedisCache(new RedisCacheOptions
-        {
-            Configuration = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>().SecuromanCacheConfiguration
-        });
-    public static string GetSecuromanUrl(IConfiguration configuration)
-        => configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>().UserServiceUrl;
+    
        
     private static byte[] AES_Encrypt(
         byte[] plain,
@@ -167,8 +158,8 @@ public static class Securoman
         
         //TODO refactor to not have hardcoded stuff
         var tokenBuilder = Pasetoman.CreateTokenPipe("auth.laghrour.com","laghrour.com",exp.DateTime);
-        tokenBuilder.AddClaim(UserClaimTypes.UserSessionId, sessionId.ToString());
-        tokenBuilder.AddClaim(UserClaimTypes.UserTicket, JsonSerializer.Serialize(claims.Select(x => new UserClaim(x.Type,x.Value/*, x.Issuer*/))));
+        tokenBuilder.AddClaim(UserClaimTypes.SessionId, sessionId.ToString());
+        tokenBuilder.AddClaim(UserClaimTypes.Ticket, JsonSerializer.Serialize(claims.Select(x => new UserClaim(x.Type,x.Value/*, x.Issuer*/))));
         tokenBuilder.AddFooter(EncryptPublicKey(publicKey, symmetricKey));
         
         
@@ -194,11 +185,11 @@ public static class Securoman
     {
         var result = Pasetoman.VerifyToken(token, publicKey, paramms ?? DefaultParameters);
         if (result.IsValid 
-            && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserTicket, out var ticket)
-            && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserSessionId, out var sessionId))
+            && result.Paseto.Payload.TryGetValue(UserClaimTypes.Ticket, out var ticket)
+            && result.Paseto.Payload.TryGetValue(UserClaimTypes.SessionId, out var sessionId))
         {
             var claims = new List<UserClaim>();
-            claims.Add(new UserClaim(UserClaimTypes.UserSessionId, sessionId.ToString()/*, "UserService"*/));
+            claims.Add(new UserClaim(UserClaimTypes.SessionId, sessionId.ToString()/*, "UserService"*/));
             claims.AddRange(JsonSerializer.Deserialize<IEnumerable<UserClaim>>(ticket.ToString()));
             return new TokenResult(result, publicKey, claims);
         }
@@ -209,11 +200,11 @@ public static class Securoman
     {
         var payload = UnsecurePayloadDecode(token);
         if (payload is null) return null;
-        if(payload.TryGetValue(UserClaimTypes.UserTicket, out var ticket) &&
-           payload.TryGetValue(UserClaimTypes.UserSessionId, out var sessionId))
+        if(payload.TryGetValue(UserClaimTypes.Ticket, out var ticket) &&
+           payload.TryGetValue(UserClaimTypes.SessionId, out var sessionId))
         {
             var claims = new List<UserClaim>();
-            claims.Add(new UserClaim(UserClaimTypes.UserSessionId, sessionId.ToString()/*, "UserService"*/));
+            claims.Add(new UserClaim(UserClaimTypes.SessionId, sessionId.ToString()/*, "UserService"*/));
             claims.AddRange(JsonSerializer.Deserialize<List<UserClaim>>(ticket.ToString()));
             return claims;
         }

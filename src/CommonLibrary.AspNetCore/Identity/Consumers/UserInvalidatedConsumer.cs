@@ -1,7 +1,4 @@
-﻿using CommonLibrary.AspNetCore.Logging;
-using MassTransit;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Configuration;
+﻿using MassTransit;
 
 namespace CommonLibrary.AspNetCore.Identity.Consumers;
 //TODO: Remove this and make it UserInvalidateConsumer()

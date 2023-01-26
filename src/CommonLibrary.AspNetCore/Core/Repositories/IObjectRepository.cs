@@ -1,5 +1,4 @@
 ﻿using CommonLibrary.Core;
-using CommonLibrary.Logging;
 
 namespace CommonLibrary.AspNetCore.Core;
 

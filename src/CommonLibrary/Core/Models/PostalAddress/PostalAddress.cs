@@ -1,5 +1,3 @@
-using CommonLibrary.Logging;
-
 namespace CommonLibrary.Core.PostalAddress
 {
     public class PostalAddress : IBusinessObject, IDeletable, ISuspendable

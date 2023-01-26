@@ -4,6 +4,7 @@ using CommonLibrary.AspNetCore.Core.Policies;
 using CommonLibrary.AspNetCore.Identity;
 using CommonLibrary.AspNetCore.Identity.Authentication;
 using CommonLibrary.AspNetCore.Identity.Consumers;
+using CommonLibrary.AspNetCore.Identity.Policies;
 using CommonLibrary.AspNetCore.Logging;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
@@ -58,7 +59,7 @@ public static class StartupExtentions
     /// <param name="originName">Name of the CORS origin policy (defaulted to none)</param>
     public static IServiceCollection AddCommonLibrary(this IServiceCollection services,
         IConfiguration configuration, ILoggingBuilder logging, LoggerConfiguration loggerConfiguration
-        , string originName, bool withSecuroman = true, bool withLogging = true)
+        ,string originName, IPolicy[]? policies = null ,bool withSecuroman = true, bool withLogging = true)
     {
         services.AddHttpContextAccessor();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -75,7 +76,6 @@ public static class StartupExtentions
             .MinimumLevel.Warning()      
 #endif
             .CreateLogger();
-        
         logging.AddSerilog(logger);
         services.AddSingleton(logger);
         services.AddCors(options =>
@@ -105,7 +105,10 @@ public static class StartupExtentions
         });
         services.AddCommonLibraryRabbitMq(withSecuroman);
         if (withSecuroman)
-            services.AddCommonLibrarySecuroman();
+        {
+            services.AddCommonLibrarySecuroman(new []{UserPolicyFactory.GetPolicy()});
+            //services.AddCommonLibrarySecuroman(policies);
+        }
         if (withLogging)
             services.AddCommonLibraryLoggingService();
         services.ConfigureOptions<ConfigureSwaggerOptions>();
@@ -152,12 +155,24 @@ public static class StartupExtentions
         app.MapControllers();
         return app;
     }
-    private static IServiceCollection AddCommonLibrarySecuroman(this IServiceCollection services) 
+    private static IServiceCollection AddCommonLibrarySecuroman(
+        this IServiceCollection services,
+        IPolicy[]? policies = null) 
     {
         services.AddSingleton<ISecuromanService, SecuromanService>();
         services.AddScoped<AuthenticationHandler<SecuromanAuthenticationOptions>,SecuromanAuthenticationHandler>();
         services.AddAuthentication(SecuromanAuthenticationHandler.SchemaName)
             .AddScheme<SecuromanAuthenticationOptions, SecuromanAuthenticationHandler>(SecuromanAuthenticationHandler.SchemaName, null);
+        services.AddAuthorization(options =>
+        {
+            if (policies != null)
+            {
+                foreach (var policy in policies)
+                {
+                    policy.Enforce(options);
+                }
+            }
+        });
         return services;
     }
     private static WebApplication UseCommonLibrarySecuroman(this WebApplication app)

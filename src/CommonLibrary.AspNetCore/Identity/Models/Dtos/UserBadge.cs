@@ -1,4 +1,6 @@
-﻿namespace CommonLibrary.AspNetCore.Identity;
+﻿using CommonLibrary.AspNetCore.Identity.Roles;
+
+namespace CommonLibrary.AspNetCore.Identity;
 
 public class UserBadge
 {

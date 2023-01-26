@@ -1,6 +1,4 @@
-﻿using CommonLibrary.Logging;
-
-namespace CommonLibrary.Core;
+﻿namespace CommonLibrary.Core;
 
 public interface IUser :  IBusinessObject
 {

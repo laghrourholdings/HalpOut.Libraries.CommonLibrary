@@ -19,7 +19,7 @@ public static class Securoman
     public static TokenSignature VerifyToken(string token, byte[] publicKey, PasetoTokenValidationParameters? paramms = null)
     {
         var result = Pasetoman.VerifyToken(token, publicKey, paramms ?? DefaultParameters);
-        if (result.IsValid && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserTicket, out var ticket))
+        if (result.IsValid && result.Paseto.Payload.TryGetValue(UserClaimTypes.Ticket, out var ticket))
         {
             var claims = JsonSerializer.Deserialize<IEnumerable<TicketClaim>>(ticket.ToString());
             return new TokenSignature(result, publicKey, claims);
