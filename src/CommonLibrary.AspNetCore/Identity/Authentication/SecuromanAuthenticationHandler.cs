@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Security.Principal;
 using System.Text.Encodings.Web;
-using CommonLibrary.AspNetCore.Identity.Roles;
 using Flurl.Http;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
@@ -59,9 +58,9 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
                     Response.Cookies.Append(SecuromanDefaults.TokenCookie, refreshedToken);
                 }
                 var identity = new ClaimsIdentity(result.Claims, SchemaName);
-                var principal = new GenericPrincipal(identity, result.RolePrincipal.Roles.ToArray());
+                var principal = new GenericPrincipal(identity, result.RolePrincipal.Select(x=>x.Name).ToArray());
                 var ticket = new AuthenticationTicket(principal, SchemaName);
-                Context.Items.Add(nameof(RolePrincipal), result.RolePrincipal);
+                Context.Items.Add(nameof(RoleIdentity), result.RolePrincipal);
                 return AuthenticateResult.Success(ticket);
             }
             catch (Exception ex)

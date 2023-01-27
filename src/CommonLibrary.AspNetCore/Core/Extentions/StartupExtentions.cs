@@ -10,6 +10,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -146,13 +147,20 @@ public static class StartupExtentions
 
         return services;
     }
-    public static WebApplication UseCommonLibrary(this WebApplication app, string originName, bool withSecuroman = true)
+    public static WebApplication UseCommonLibrary(this WebApplication app, string originName,
+        bool withSecuroman = true)
     {
         if (withSecuroman)
-            app.UseCommonLibrarySecuroman();
+            app.UseAuthentication();
         app.UseHttpsRedirection();
         app.UseCors(originName);
-        app.MapControllers();
+        app.UseRouting();
+        if(withSecuroman)
+            app.UseAuthorization();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
         return app;
     }
     private static IServiceCollection AddCommonLibrarySecuroman(
@@ -165,6 +173,7 @@ public static class StartupExtentions
             .AddScheme<SecuromanAuthenticationOptions, SecuromanAuthenticationHandler>(SecuromanAuthenticationHandler.SchemaName, null);
         services.AddAuthorization(options =>
         {
+            UserPolicyFactory.GetPolicy().Enforce(options);
             if (policies != null)
             {
                 foreach (var policy in policies)
@@ -174,12 +183,5 @@ public static class StartupExtentions
             }
         });
         return services;
-    }
-    private static WebApplication UseCommonLibrarySecuroman(this WebApplication app)
-    {
-        //app.UseMiddleware<SecuromanMiddleware>();
-        app.UseAuthentication();
-        app.UseAuthorization();
-        return app;
     }
 }

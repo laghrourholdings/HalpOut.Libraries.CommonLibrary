@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using CommonLibrary.AspNetCore.Core;
-using CommonLibrary.AspNetCore.Identity.Roles;
 using CommonLibrary.Identity.Models;
 using Flurl.Http;
 using Microsoft.AspNetCore.Http;
@@ -37,12 +36,13 @@ public class SecuromanService : ISecuromanService
     private readonly IDistributedCache _cache;
     private readonly string _securomanUrl;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    //private readonly string _securomanGrpcUrl;
 
     public class UserBadgeCacheData
     {
         public Guid LogHandleId { get; set; }
         public byte[] SecretKey { get; set; }
-        public RolePrincipal RolePrincipal { get; set; }
+        public List<RoleIdentity> RolePrincipal { get; set; }
     }
 
     public SecuromanService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
@@ -51,31 +51,32 @@ public class SecuromanService : ISecuromanService
         _httpContextAccessor = httpContextAccessor;
         _cache = GetSecuromanCache();
         _securomanUrl = GetSecuromanUrl();
+        //_securomanGrpcUrl = GetUserServiceGrpcUrl();
     }
 
     public bool HasPermission(string permission)
     {
         var rolePrincipal = GetContextRolePrincipal();
         if (!IsAuthenticated() || rolePrincipal  == null) return false;
-        return rolePrincipal.Permissions.Any(x => x.Value == permission);
+        return rolePrincipal.Any(x=>x.Name == permission);
     }
 
     public bool IsInRole(string roleName)
     {
         var rolePrincipal = GetContextRolePrincipal();
         if (!IsAuthenticated() || rolePrincipal  == null) return false;
-        return rolePrincipal.Roles.Contains(roleName);
+        return rolePrincipal.Any(x=>x.Name == roleName);
     }
 
     public UserPermission? GetPermission(string permission)
     {
         var rolePrincipal = GetContextRolePrincipal();
         if (!IsAuthenticated() || rolePrincipal  == null) return null;
-        return rolePrincipal.Permissions.FirstOrDefault(x => x.Value == permission);
+        return rolePrincipal.SelectMany(x=>x.Permissions).SingleOrDefault(x => x.Value == permission);
     }
     
-    private RolePrincipal? GetContextRolePrincipal()
-        => _httpContextAccessor.HttpContext?.Items[nameof(RolePrincipal)] as RolePrincipal;
+    private List<RoleIdentity>? GetContextRolePrincipal()
+        => _httpContextAccessor.HttpContext?.Items[nameof(RoleIdentity)] as List<RoleIdentity>;
 
 
 
@@ -98,6 +99,7 @@ public class SecuromanService : ISecuromanService
         {
             try
             {
+                //var channel = GrpcChannel.ForAddress(_securomanGrpcUrl);
                 var userBadgerRequest = _securomanUrl
                     .WithCookies(_httpContextAccessor.HttpContext?.Request.Cookies)
                     .AppendPathSegment("api/v1/auth")
@@ -195,4 +197,7 @@ public class SecuromanService : ISecuromanService
     public string GetSecuromanUrl() 
         => _config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>().UserServiceUrl 
            ?? throw new InvalidOperationException("Securoman url is inexistant");
+    public string GetUserServiceGrpcUrl() 
+        => _config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>().UserServiceGrpcUrl 
+           ?? throw new InvalidOperationException("Securoman grpc url is inexistant");
 }

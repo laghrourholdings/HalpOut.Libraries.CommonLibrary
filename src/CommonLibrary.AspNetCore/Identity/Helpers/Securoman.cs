@@ -2,7 +2,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using CommonLibrary.AspNetCore.Identity.Roles;
 using CommonLibrary.Identity.Models;
 using Paseto;
 using Paseto.Cryptography.Key;
@@ -16,14 +15,14 @@ public static class Securoman
     {
         public bool Succeeded { get;}
         public string? ErrorMessage { get; }
-        public RolePrincipal? RolePrincipal { get; }
+        public List<RoleIdentity>? RolePrincipal { get; } = new();
         public IEnumerable<Claim>? Claims { get;}
         public AuthenticateResult(string errorMessage)
         {
             Succeeded = false;
             ErrorMessage = errorMessage;
         }
-        public AuthenticateResult(RolePrincipal rolePrincipal, IEnumerable<Claim> claims)
+        public AuthenticateResult(List<RoleIdentity> rolePrincipal, IEnumerable<Claim> claims)
         {
             Succeeded = true;
             RolePrincipal = rolePrincipal;

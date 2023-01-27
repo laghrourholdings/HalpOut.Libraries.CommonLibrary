@@ -1,9 +1,8 @@
-﻿namespace CommonLibrary.AspNetCore.Identity.Roles;
+﻿namespace CommonLibrary.AspNetCore.Identity;
 
 
 public class UserPermission
 { 
         public string Type { get; set; }
         public string Value { get; set; }
-        /*public string Issuer { get; set; }*/
 }
