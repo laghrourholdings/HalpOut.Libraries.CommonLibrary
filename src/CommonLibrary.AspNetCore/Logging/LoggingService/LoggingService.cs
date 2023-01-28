@@ -1,5 +1,6 @@
 ﻿using CommonLibrary.Logging.Models.Dtos;
 using MassTransit;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace CommonLibrary.AspNetCore.Logging;
@@ -39,15 +40,18 @@ public class LoggingService : ILoggingService
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly IConfiguration _config;
     private readonly Serilog.ILogger _logger;
-    
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
     public LoggingService(
         IPublishEndpoint publishEndpoint,
         IConfiguration config,
-        Serilog.ILogger logger)
+        Serilog.ILogger logger,
+        IHttpContextAccessor httpContextAccessor)
     {
         _publishEndpoint = publishEndpoint;
         _config = config;
         _logger = logger;
+        _httpContextAccessor = httpContextAccessor;
     }
     /// <summary>
     /// Returns the current ILogger
@@ -57,7 +61,7 @@ public class LoggingService : ILoggingService
     {
         return _logger;
     }
-    
+
     //TODO Checks with cache to see if the logHandleId is valid
     /// <summary>
     /// Logs a debug message to configured sinks, and sends a copy to the database for archiving if a logHandleId is provided.

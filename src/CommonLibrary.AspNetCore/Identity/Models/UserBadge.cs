@@ -6,5 +6,5 @@ public class UserBadge
     public Guid LogHandleId { get; set; }
     public byte[] SecretKey { get; set; }
 
-    public List<RoleIdentity> RolePrincipal { get; set; } = new();
+    //public List<RoleIdentity> RolePrincipal { get; set; } = new();
 }

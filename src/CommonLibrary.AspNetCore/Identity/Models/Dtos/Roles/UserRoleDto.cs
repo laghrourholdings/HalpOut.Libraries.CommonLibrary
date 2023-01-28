@@ -3,5 +3,5 @@
 public class UserRoleDto
 {
     public Guid UserId { get; set; }
-    public string RoleName;
+    public string RoleName { get; set; }
 }

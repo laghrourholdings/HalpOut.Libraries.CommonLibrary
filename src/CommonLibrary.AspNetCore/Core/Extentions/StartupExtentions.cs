@@ -108,7 +108,7 @@ public static class StartupExtentions
         if (withSecuroman)
         {
             services.AddCommonLibrarySecuroman(new []{UserPolicyFactory.GetPolicy()});
-            //services.AddCommonLibrarySecuroman(policies);
+            //services.AddCommonLibrarySecuroman(additionnalPolicies);
         }
         if (withLogging)
             services.AddCommonLibraryLoggingService();
@@ -165,7 +165,7 @@ public static class StartupExtentions
     }
     private static IServiceCollection AddCommonLibrarySecuroman(
         this IServiceCollection services,
-        IPolicy[]? policies = null) 
+        IPolicy[]? additionnalPolicies = null) 
     {
         services.AddSingleton<ISecuromanService, SecuromanService>();
         services.AddScoped<AuthenticationHandler<SecuromanAuthenticationOptions>,SecuromanAuthenticationHandler>();
@@ -174,9 +174,9 @@ public static class StartupExtentions
         services.AddAuthorization(options =>
         {
             UserPolicyFactory.GetPolicy().Enforce(options);
-            if (policies != null)
+            if (additionnalPolicies != null)
             {
-                foreach (var policy in policies)
+                foreach (var policy in additionnalPolicies)
                 {
                     policy.Enforce(options);
                 }

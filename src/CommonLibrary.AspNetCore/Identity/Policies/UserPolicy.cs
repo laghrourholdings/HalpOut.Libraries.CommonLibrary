@@ -1,3 +1,4 @@
+using CommonLibrary.Identity.Models;
 using Microsoft.AspNetCore.Authorization;
 
 namespace CommonLibrary.AspNetCore.Identity.Policies;
@@ -18,7 +19,7 @@ public class UserPolicy : IPolicy
     public AuthorizationOptions Enforce(AuthorizationOptions options)
     {
         options.AddPolicy(ELEVATED_RIGHTS, policy =>
-            policy.RequireRole("Admin"));
+            policy.RequireClaim(UserClaimTypes.Role, "Admin"));
         options.AddPolicy(AUTHENTICATED, policy =>
             policy.RequireAuthenticatedUser());
         return options;    

@@ -18,16 +18,19 @@ public interface ISecuromanService
     Task<Securoman.AuthenticateResult> Authenticate(string token);
     //Task<TokenResult?> Authenticate();
     bool IsAuthenticated();
-    Task SetOrUpdateUserAsync(UserBadge badge);
+    // Task SetOrUpdateUserAsync(UserBadge badge);
     Task RemoveUserAsync(Guid userId);
-    Task<UserBadge?> GetUserFromSecuromanCache(Guid userId);
+    // Task<UserBadge?> GetUserFromSecuromanCache(Guid userId);
     //Guid? GetUnverifiedLogHandleId(string token);
-    public string GetSecuromanUrl();
     public bool HasPermission(string permission);
-    public bool IsInRole(string roleName);
-    public UserPermission? GetPermission(string permission);
+    public bool HasPrivilege(string privilege);
+    public bool HasRight(string right);
+    public bool HasRole(string roleName);
+    public Task<RoleIdentity?> GetRole(string roleName);
+    public Task<List<RoleIdentity>?> GetRoles();
     public Guid GetLogHandleId();
     public Guid GetUserId();
+    public string GetSecuromanUrl();
 }
 
 public class SecuromanService : ISecuromanService
@@ -42,7 +45,7 @@ public class SecuromanService : ISecuromanService
     {
         public Guid LogHandleId { get; set; }
         public byte[] SecretKey { get; set; }
-        public List<RoleIdentity> RolePrincipal { get; set; }
+        //public List<RoleIdentity> RolePrincipal { get; set; }
     }
 
     public SecuromanService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
@@ -54,32 +57,66 @@ public class SecuromanService : ISecuromanService
         //_securomanGrpcUrl = GetUserServiceGrpcUrl();
     }
 
-    public bool HasPermission(string permission)
-    {
-        var rolePrincipal = GetContextRolePrincipal();
-        if (!IsAuthenticated() || rolePrincipal  == null) return false;
-        return rolePrincipal.Any(x=>x.Name == permission);
-    }
+    
 
-    public bool IsInRole(string roleName)
+    public bool HasRole(string role)
     {
-        var rolePrincipal = GetContextRolePrincipal();
-        if (!IsAuthenticated() || rolePrincipal  == null) return false;
-        return rolePrincipal.Any(x=>x.Name == roleName);
+        return IsAuthenticated() 
+               && _httpContextAccessor.HttpContext != null
+               && _httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Role, role);
     }
-
-    public UserPermission? GetPermission(string permission)
+    public bool HasRight(string right)
     {
-        var rolePrincipal = GetContextRolePrincipal();
-        if (!IsAuthenticated() || rolePrincipal  == null) return null;
-        return rolePrincipal.SelectMany(x=>x.Permissions).SingleOrDefault(x => x.Value == permission);
+        return IsAuthenticated() 
+               && _httpContextAccessor.HttpContext != null
+               && _httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Right, right);
     }
     
+    public bool HasPrivilege(string privilege)
+    {
+        return IsAuthenticated() 
+               && _httpContextAccessor.HttpContext != null
+               && _httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Privilege, privilege);
+    }
+    
+    public bool HasPermission(string permission)
+    {
+        return IsAuthenticated() 
+               && _httpContextAccessor.HttpContext != null && 
+               (_httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Right, permission) 
+                || _httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Privilege, permission));
+    }
+
+    // public bool HasPermission(string permission)
+    // {
+    //     var permissions = GetContextPermissions();
+    //     if (!IsAuthenticated() || permissions  == null) return false;
+    //     return permissions.Any(x=>x == permission);
+    // }
+    
+    public async Task<RoleIdentity?> GetRole(string roleName)
+    {
+        var principal = GetContextRolePrincipal();
+        if (!IsAuthenticated() || principal == null) return null;
+        return principal.SingleOrDefault(x => x.Name == roleName);
+    }
+    public async Task<List<RoleIdentity>?> GetRoles()
+    {
+        var principal = GetContextRolePrincipal();
+        if (!IsAuthenticated() || principal == null) return null;
+        return principal;
+    }
+
     private List<RoleIdentity>? GetContextRolePrincipal()
-        => _httpContextAccessor.HttpContext?.Items[nameof(RoleIdentity)] as List<RoleIdentity>;
+        => _httpContextAccessor.HttpContext?.Items[SecuromanDefaults.ContextRolePrincipal] as List<RoleIdentity>;
+    
+    // private List<string>? GetContextRoles()
+    //     => _httpContextAccessor.HttpContext?.Items[SecuromanDefaults.ContextRoles] as List<string>;
+    //
+    // private List<string>? GetContextPermissions()
+    //     => _httpContextAccessor.HttpContext?.Items[SecuromanDefaults.ContextPermissions] as List<string>;
 
-
-
+    
     public Guid GetLogHandleId() => 
         new(_httpContextAccessor.HttpContext.User.Claims.First(x => x.Type == UserClaimTypes.LogHandleId).Value);
 
@@ -100,9 +137,29 @@ public class SecuromanService : ISecuromanService
             try
             {
                 //var channel = GrpcChannel.ForAddress(_securomanGrpcUrl);
+                /*try
+                {
+                    token = await GetSecuromanUrl()
+                        .WithHeader("User-Agent", _httpContextAccessor.HttpContext.Request.Headers.UserAgent)
+                        .WithCookies(_httpContextAccessor.HttpContext.Request.Cookies)
+                        .AppendPathSegment("api/v1/auth")
+                        .AppendPathSegment("refreshToken")
+                        .GetStringAsync();
+                    if(token==null)
+                        return new Securoman.AuthenticateResult("Unauthorized", false);
+                    _httpContextAccessor.HttpContext.Response.Cookies.Append(SecuromanDefaults.TokenCookie, token,
+                         new CookieOptions
+                        {
+                            Expires = new DateTimeOffset(2038, 1, 1, 0, 0, 0, TimeSpan.FromHours(0)),
+                            Secure = true
+                        });
+                }catch (FlurlHttpException ex)
+                {
+                    return new Securoman.AuthenticateResult(ex.Message, false);
+                }*/
                 var userBadgerRequest = _securomanUrl
                     .WithCookies(_httpContextAccessor.HttpContext?.Request.Cookies)
-                    .AppendPathSegment("api/v1/auth")
+                    .AppendPathSegment("api/v1/user")
                     .AppendPathSegment("refreshBadge");
                 var updatedUserBadge = await userBadgerRequest.GetJsonAsync<UserBadge>();
                 if (updatedUserBadge == null) return new Securoman.AuthenticateResult("Failed to grab user badge");
@@ -117,15 +174,15 @@ public class SecuromanService : ISecuromanService
 
         var verify = Securoman.VerifyTokenWithSecret(token, userBadge.SecretKey);
         if (verify.Result.IsValid)
-            return new Securoman.AuthenticateResult(userBadge.RolePrincipal,
-                verify.Claims.Select(x => new Claim(x.Type, x.Value /*, x.Issuer*/)));
+            return new Securoman.AuthenticateResult(/*userBadge.RolePrincipal,*/
+                verify.Claims.Select(x => new Claim(x.Type, x.Value)));
         if (!verify.HasInvalidSecretKey)
             return new Securoman.AuthenticateResult(verify.Result.Exception.Message);
         await RemoveUserAsync(new Guid(userId));
         return await Authenticate(token);
     }
 
-    public Task SetOrUpdateUserAsync(UserBadge badge)
+    private Task SetOrUpdateUserAsync(UserBadge badge)
     { 
         var options = new DistributedCacheEntryOptions();
         options.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7);
@@ -149,11 +206,11 @@ public class SecuromanService : ISecuromanService
             LogHandleId = userBadgeCacheData.LogHandleId,
             SecretKey = userBadgeCacheData.SecretKey,
             UserId = userId,
-            RolePrincipal = userBadgeCacheData.RolePrincipal
+            //RolePrincipal = userBadgeCacheData.RolePrincipal
         };
     }
     
-    public async Task<UserBadge?> GetUserFromSecuromanCache(Guid userId)
+    private async Task<UserBadge?> GetUserFromSecuromanCache(Guid userId)
     {
         var key = userId.ToString();
         var rawCacheData = await _cache.GetAsync(key);
@@ -165,7 +222,7 @@ public class SecuromanService : ISecuromanService
         {
             LogHandleId = userBadgeCacheData.LogHandleId, 
             UserId = userId,
-            RolePrincipal = userBadgeCacheData.RolePrincipal
+            //RolePrincipal = userBadgeCacheData.RolePrincipal
         };
     }
     
@@ -175,7 +232,7 @@ public class SecuromanService : ISecuromanService
         {
             LogHandleId = badge.LogHandleId,
             SecretKey = badge.SecretKey,
-            RolePrincipal = badge.RolePrincipal
+            //RolePrincipal = badge.RolePrincipal
         };
         return Encoding.UTF8.GetBytes(JsonSerializer.Serialize(badgeStore));
     }
@@ -197,7 +254,7 @@ public class SecuromanService : ISecuromanService
     public string GetSecuromanUrl() 
         => _config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>().UserServiceUrl 
            ?? throw new InvalidOperationException("Securoman url is inexistant");
-    public string GetUserServiceGrpcUrl() 
+    private string GetUserServiceGrpcUrl() 
         => _config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>().UserServiceGrpcUrl 
            ?? throw new InvalidOperationException("Securoman grpc url is inexistant");
 }

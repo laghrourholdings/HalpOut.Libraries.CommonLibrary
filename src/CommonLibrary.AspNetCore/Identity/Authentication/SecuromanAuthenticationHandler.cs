@@ -1,8 +1,10 @@
 ﻿using System.Security.Claims;
 using System.Security.Principal;
 using System.Text.Encodings.Web;
+using CommonLibrary.Identity.Models;
 using Flurl.Http;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -43,10 +45,12 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
                 var result = await _securomanService.Authenticate(token);
                 if (!result.Succeeded)
                 {
+                    /*if(!result.RefreshToken)
+                        return AuthenticateResult.Fail(result.ErrorMessage);*/
                     var refreshedToken = await _securomanService.GetSecuromanUrl()
                         .WithHeader("User-Agent", Request.Headers.UserAgent)
                         .WithCookies(Request.Cookies)
-                        .AppendPathSegment("api/v1/auth")
+                        .AppendPathSegment("api/v1/user")
                         .AppendPathSegment("refreshToken")
                         .GetStringAsync();
                     if(refreshedToken==null)
@@ -55,12 +59,20 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
                     if(!secondResult.Succeeded) 
                         return AuthenticateResult.Fail(secondResult.ErrorMessage);
                     result = secondResult;
-                    Response.Cookies.Append(SecuromanDefaults.TokenCookie, refreshedToken);
+                    Response.Cookies.Append(SecuromanDefaults.TokenCookie, refreshedToken, 
+                        new CookieOptions
+                    {
+                        Expires = new DateTimeOffset(2038, 1, 1, 0, 0, 0, TimeSpan.FromHours(0)),
+                        Secure = true
+                    });
                 }
                 var identity = new ClaimsIdentity(result.Claims, SchemaName);
-                var principal = new GenericPrincipal(identity, result.RolePrincipal.Select(x=>x.Name).ToArray());
+                //TODO: urgent, fix this: Authorize attribute should not look at roles set here
+                var principal = new GenericPrincipal(identity, null);
                 var ticket = new AuthenticationTicket(principal, SchemaName);
-                Context.Items.Add(nameof(RoleIdentity), result.RolePrincipal);
+                // Context.Items.Add(SecuromanDefaults.ContextPermissions, result.RolePrincipal.SelectMany(x=>x.Properties)
+                //     .Where(x=>x.Type==UserClaimTypes.Right || x.Type == UserClaimTypes.Privilege).Select(x=>x.Value).ToList());
+                // Context.Items.Add(SecuromanDefaults.ContextRoles, result.RolePrincipal.SelectMany(x=>x.Name).ToList());
                 return AuthenticateResult.Success(ticket);
             }
             catch (Exception ex)

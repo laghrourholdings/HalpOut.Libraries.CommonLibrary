@@ -15,17 +15,20 @@ public static class Securoman
     {
         public bool Succeeded { get;}
         public string? ErrorMessage { get; }
-        public List<RoleIdentity>? RolePrincipal { get; } = new();
+        //public bool RefreshToken { get; }
+        //public List<RoleIdentity>? RolePrincipal { get; } = new();
         public IEnumerable<Claim>? Claims { get;}
-        public AuthenticateResult(string errorMessage)
+        public AuthenticateResult(string errorMessage/*, bool refreshToken = true*/)
         {
             Succeeded = false;
+            //RefreshToken = refreshToken;
             ErrorMessage = errorMessage;
         }
-        public AuthenticateResult(List<RoleIdentity> rolePrincipal, IEnumerable<Claim> claims)
+        public AuthenticateResult(/*List<RoleIdentity> rolePrincipal,*/ IEnumerable<Claim> claims)
         {
             Succeeded = true;
-            RolePrincipal = rolePrincipal;
+            //RefreshToken = false;
+            //RolePrincipal = rolePrincipal;
             Claims = claims;
         }
     }
