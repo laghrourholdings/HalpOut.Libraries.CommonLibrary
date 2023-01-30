@@ -2,5 +2,5 @@
 
 public interface IUser :  IBusinessObject
 {
-    //TODO 
+    public Guid Id { get; set; }
 }

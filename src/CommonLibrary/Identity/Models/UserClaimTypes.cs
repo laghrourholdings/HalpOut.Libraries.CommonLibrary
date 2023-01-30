@@ -5,7 +5,7 @@ public static class UserClaimTypes
     public static string Id = "UID";
     public static string Name = "UNAME";
     public static string Email = "UEMAIL";
-    public static string Ticket = "UTICKET";
+    public static string UserClaims = "UUC";
     public static string SessionId = "SID";
     public static string LogHandleId = "LHID";
     public static string Role = "UROLE";

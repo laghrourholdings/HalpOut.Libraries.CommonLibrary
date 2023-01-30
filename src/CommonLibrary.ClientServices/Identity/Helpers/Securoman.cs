@@ -1,47 +1,47 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using CommonLibrary.Identity.Models;
-using Paseto;
+using CommonLibrary.Identity.Models.Dtos;
 
 namespace CommonLibrary.ClientServices.Identity.Helpers;
 
 public static class Securoman
 {
-    public record TicketClaim(string Type, string Value);
-    public static PasetoTokenValidationParameters DefaultParameters { get; } = new PasetoTokenValidationParameters
+    public static IEnumerable<UserClaim>? GetUserClaims(string token)
     {
-        ValidateLifetime = true,
-        ValidateAudience = true,
-        ValidateIssuer = true,
-        ValidAudience = "laghrour.com",
-        ValidIssuer = "auth.laghrour.com"
-    };
-    
-    public static TokenSignature VerifyToken(string token, byte[] publicKey, PasetoTokenValidationParameters? paramms = null)
-    {
-        var result = Pasetoman.VerifyToken(token, publicKey, paramms ?? DefaultParameters);
-        if (result.IsValid && result.Paseto.Payload.TryGetValue(UserClaimTypes.Ticket, out var ticket))
+        var payload = DecodeToken(token);
+        if (payload is null) return null;
+        if(payload.TryGetValue(UserClaimTypes.UserClaims, out var ticket) &&
+           payload.TryGetValue(UserClaimTypes.SessionId, out var sessionId))
         {
-            var claims = JsonSerializer.Deserialize<IEnumerable<TicketClaim>>(ticket.ToString());
-            return new TokenSignature(result, publicKey, claims);
+            var claims = new List<UserClaim>();
+            claims.Add(new UserClaim(UserClaimTypes.SessionId, sessionId.ToString()/*, "UserService"*/));
+            claims.AddRange(JsonSerializer.Deserialize<List<UserClaim>>(ticket.ToString()));
+            return claims;
         }
-        return new TokenSignature(result);
+        return null;
     }
-
-    public class TokenSignature
+    private static IDictionary<string, object>? DecodeToken(string token)
     {
-        public PasetoTokenValidationResult Result { get; }
-
-        public TokenSignature(PasetoTokenValidationResult result, byte[] publicKey, IEnumerable<TicketClaim> claims)
+        
+        var tokenParts = token.Split('.');
+        var bytes = FromBase64Url(tokenParts[2]);
+        if (bytes.Length <= 64)
+            return null;
+        byte[] payload = bytes.Take(bytes.Length - 64).ToArray();
+        return JsonSerializer.Deserialize<Dictionary<string, object>>(Encoding.UTF8.GetString(payload));
+    }
+    private static byte[] FromBase64Url(string source)
+    {
+        try
         {
-            Result = result;
-            PublicKey = publicKey;
-            Claims = claims;
+            return Convert.FromBase64String(source.PadRight((source.Length % 4) == 0 ? 0 : (source.Length + 4 - (source.Length % 4)), '=')
+                .Replace('-', '+')
+                .Replace('_', '/'));
         }
-        public TokenSignature(PasetoTokenValidationResult result)
+        catch (FormatException e)
         {
-            Result = result;
+            throw new FormatException("The base64 encoding was invalid. " + e);
         }
-        public byte[] PublicKey { get; }
-        public IEnumerable<TicketClaim> Claims { get; set; }
     }
 }

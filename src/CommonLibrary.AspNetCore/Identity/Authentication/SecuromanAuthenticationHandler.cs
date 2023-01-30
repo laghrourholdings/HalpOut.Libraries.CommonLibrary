@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Security.Principal;
 using System.Text.Encodings.Web;
-using CommonLibrary.Identity.Models;
 using Flurl.Http;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;

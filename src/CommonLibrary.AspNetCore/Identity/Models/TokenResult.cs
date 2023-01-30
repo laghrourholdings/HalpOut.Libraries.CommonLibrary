@@ -1,4 +1,5 @@
-﻿using Paseto;
+﻿using CommonLibrary.Identity.Models.Dtos;
+using Paseto;
 
 namespace CommonLibrary.AspNetCore.Identity;
 
@@ -6,7 +7,7 @@ public class TokenResult
 {
     public PasetoTokenValidationResult Result { get; }
 
-    public TokenResult(PasetoTokenValidationResult result, byte[] publicKey, IEnumerable<Securoman.UserClaim> claims)
+    public TokenResult(PasetoTokenValidationResult result, byte[] publicKey, IEnumerable<UserClaim> claims)
     {
         Result = result;
         PublicKey = publicKey;
@@ -22,5 +23,5 @@ public class TokenResult
     }
     public bool HasInvalidSecretKey { get; }
     public byte[] PublicKey { get; }
-    public IEnumerable<Securoman.UserClaim> Claims { get;}
+    public IEnumerable<UserClaim> Claims { get;}
 }

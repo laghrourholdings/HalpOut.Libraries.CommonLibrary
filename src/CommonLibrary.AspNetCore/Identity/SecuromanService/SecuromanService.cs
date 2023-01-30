@@ -26,10 +26,12 @@ public interface ISecuromanService
     public bool HasPrivilege(string privilege);
     public bool HasRight(string right);
     public bool HasRole(string roleName);
-    public Task<RoleIdentity?> GetRole(string roleName);
-    public Task<List<RoleIdentity>?> GetRoles();
+    //public Task<RoleIdentity?> GetRole(string roleName);
+    //public Task<List<RoleIdentity>?> GetRoles();
     public Guid GetLogHandleId();
     public Guid GetUserId();
+    public string? GetClaim(string type);
+    public IEnumerable<string>? GetClaims(string type);
     public string GetSecuromanUrl();
 }
 
@@ -61,54 +63,42 @@ public class SecuromanService : ISecuromanService
 
     public bool HasRole(string role)
     {
-        return IsAuthenticated() 
-               && _httpContextAccessor.HttpContext != null
-               && _httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Role, role);
+        return IsAuthenticated()
+               && _httpContextAccessor.HttpContext!.User.HasClaim(UserClaimTypes.Role, role);
     }
     public bool HasRight(string right)
     {
-        return IsAuthenticated() 
-               && _httpContextAccessor.HttpContext != null
-               && _httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Right, right);
+        return IsAuthenticated()
+               && _httpContextAccessor.HttpContext!.User.HasClaim(UserClaimTypes.Right, right);
     }
     
     public bool HasPrivilege(string privilege)
     {
         return IsAuthenticated() 
-               && _httpContextAccessor.HttpContext != null
-               && _httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Privilege, privilege);
+               && _httpContextAccessor.HttpContext!.User.HasClaim(UserClaimTypes.Privilege, privilege);
     }
     
     public bool HasPermission(string permission)
     {
-        return IsAuthenticated() 
-               && _httpContextAccessor.HttpContext != null && 
-               (_httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Right, permission) 
+        return IsAuthenticated() && 
+               (_httpContextAccessor.HttpContext!.User.HasClaim(UserClaimTypes.Right, permission) 
                 || _httpContextAccessor.HttpContext.User.HasClaim(UserClaimTypes.Privilege, permission));
     }
-
-    // public bool HasPermission(string permission)
-    // {
-    //     var permissions = GetContextPermissions();
-    //     if (!IsAuthenticated() || permissions  == null) return false;
-    //     return permissions.Any(x=>x == permission);
-    // }
     
-    public async Task<RoleIdentity?> GetRole(string roleName)
+    public string? GetClaim(string type)
     {
-        var principal = GetContextRolePrincipal();
-        if (!IsAuthenticated() || principal == null) return null;
-        return principal.SingleOrDefault(x => x.Name == roleName);
+        return !IsAuthenticated() ? null : _httpContextAccessor.HttpContext!.User.Claims.FirstOrDefault(x => x.Type == type)?.Value; 
     }
-    public async Task<List<RoleIdentity>?> GetRoles()
+    //TODO: add TryGet...
+    public IEnumerable<string>? GetClaims(string type)
     {
-        var principal = GetContextRolePrincipal();
-        if (!IsAuthenticated() || principal == null) return null;
-        return principal;
+        return !IsAuthenticated()
+            ? null
+            : _httpContextAccessor.HttpContext!.User.Claims.Where(x => x.Type == type).Select(x => x.Value);
     }
 
-    private List<RoleIdentity>? GetContextRolePrincipal()
-        => _httpContextAccessor.HttpContext?.Items[SecuromanDefaults.ContextRolePrincipal] as List<RoleIdentity>;
+    // private List<RoleIdentity>? GetContextRolePrincipal()
+    //     => _httpContextAccessor.HttpContext?.Items[SecuromanDefaults.ContextRolePrincipal] as List<RoleIdentity>;
     
     // private List<string>? GetContextRoles()
     //     => _httpContextAccessor.HttpContext?.Items[SecuromanDefaults.ContextRoles] as List<string>;
@@ -118,17 +108,18 @@ public class SecuromanService : ISecuromanService
 
     
     public Guid GetLogHandleId() => 
-        new(_httpContextAccessor.HttpContext.User.Claims.First(x => x.Type == UserClaimTypes.LogHandleId).Value);
+        new(GetClaim(UserClaimTypes.LogHandleId)!);
 
     public Guid GetUserId() => 
-        new(_httpContextAccessor.HttpContext.User.Claims.First(x => x.Type == UserClaimTypes.Id).Value);
+        new(GetClaim(UserClaimTypes.Id)!);
 
     public bool IsAuthenticated() 
-        => _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == UserClaimTypes.Id) != null;
+        => _httpContextAccessor.HttpContext?.User.Identity != null 
+           && _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 
     public async Task<Securoman.AuthenticateResult> Authenticate(string token)
     {
-        var payload = Securoman.GetUnverifiedUserTicket(token);
+        var payload = Securoman.GetUnverifiedUserClaims(token);
         var userId = payload?.FirstOrDefault(x => x.Type == UserClaimTypes.Id)?.Value;
         if (userId == null) return new Securoman.AuthenticateResult("UserId is null");
         var userBadge = await GetUser(new Guid(userId));
@@ -254,7 +245,7 @@ public class SecuromanService : ISecuromanService
     public string GetSecuromanUrl() 
         => _config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>().UserServiceUrl 
            ?? throw new InvalidOperationException("Securoman url is inexistant");
-    private string GetUserServiceGrpcUrl() 
-        => _config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>().UserServiceGrpcUrl 
-           ?? throw new InvalidOperationException("Securoman grpc url is inexistant");
+    // private string GetUserServiceGrpcUrl() 
+    //     => _config.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>().UserServiceGrpcUrl 
+    //        ?? throw new InvalidOperationException("Securoman grpc url is inexistant");
 }

@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using CommonLibrary.Identity.Models;
+using CommonLibrary.Identity.Models.Dtos;
 using Paseto;
 using Paseto.Cryptography.Key;
 
@@ -10,7 +11,6 @@ namespace CommonLibrary.AspNetCore.Identity;
 
 public static class Securoman
 {
-    public record UserClaim(string Type, string Value/*, string Issuer*/);
     public class AuthenticateResult
     {
         public bool Succeeded { get;}
@@ -161,7 +161,7 @@ public static class Securoman
         //TODO refactor to not have hardcoded stuff
         var tokenBuilder = Pasetoman.CreateTokenPipe("auth.laghrour.com","laghrour.com",exp.DateTime);
         tokenBuilder.AddClaim(UserClaimTypes.SessionId, sessionId.ToString());
-        tokenBuilder.AddClaim(UserClaimTypes.Ticket, JsonSerializer.Serialize(claims.Select(x => new UserClaim(x.Type,x.Value/*, x.Issuer*/))));
+        tokenBuilder.AddClaim(UserClaimTypes.UserClaims, JsonSerializer.Serialize(claims.Select(x => new UserClaim(x.Type,x.Value/*, x.Issuer*/))));
         tokenBuilder.AddFooter(EncryptPublicKey(publicKey, symmetricKey));
         
         
@@ -187,7 +187,7 @@ public static class Securoman
     {
         var result = Pasetoman.VerifyToken(token, publicKey, paramms ?? DefaultParameters);
         if (result.IsValid 
-            && result.Paseto.Payload.TryGetValue(UserClaimTypes.Ticket, out var ticket)
+            && result.Paseto.Payload.TryGetValue(UserClaimTypes.UserClaims, out var ticket)
             && result.Paseto.Payload.TryGetValue(UserClaimTypes.SessionId, out var sessionId))
         {
             var claims = new List<UserClaim>();
@@ -198,16 +198,16 @@ public static class Securoman
         return new TokenResult(result);
     }
 
-    public static IEnumerable<UserClaim>? GetUnverifiedUserTicket(string token)
+    public static IEnumerable<UserClaim>? GetUnverifiedUserClaims(string token)
     {
         var payload = UnsecurePayloadDecode(token);
         if (payload is null) return null;
-        if(payload.TryGetValue(UserClaimTypes.Ticket, out var ticket) &&
+        if(payload.TryGetValue(UserClaimTypes.UserClaims, out var userClaims) &&
            payload.TryGetValue(UserClaimTypes.SessionId, out var sessionId))
         {
             var claims = new List<UserClaim>();
             claims.Add(new UserClaim(UserClaimTypes.SessionId, sessionId.ToString()/*, "UserService"*/));
-            claims.AddRange(JsonSerializer.Deserialize<List<UserClaim>>(ticket.ToString()));
+            claims.AddRange(JsonSerializer.Deserialize<List<UserClaim>>(userClaims.ToString()));
             return claims;
         }
         return null;
@@ -224,19 +224,19 @@ public static class Securoman
         return JsonSerializer.Deserialize<Dictionary<string, object>>(Encoding.UTF8.GetString(payload));
     }
 
-    public static byte[] PreAuthEncode(IReadOnlyList<byte[]> pieces) =>
+    private static byte[] PreAuthEncode(IReadOnlyList<byte[]> pieces) =>
         BitConverter.GetBytes((ulong) pieces.Count)
             .Concat(pieces.SelectMany(piece => BitConverter.GetBytes((ulong) piece.Length).Concat(piece)))
             .ToArray();
 
-    public static string ToBase64Url(IEnumerable<byte> source) =>
+    private static string ToBase64Url(IEnumerable<byte> source) =>
         Convert.ToBase64String(source.ToArray())
             .Replace("=", "")
             .Replace('+', '-')
             .Replace('/', '_');
 
     // Replace some characters in the base 64 string and add padding so .NET can parse it
-    public static byte[] FromBase64Url(string source)
+    private static byte[] FromBase64Url(string source)
     {
         try
         {

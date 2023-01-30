@@ -19,6 +19,7 @@
         <PackageReference Include="LaghrourHoldings.HalpOut.CommonLibrary" Version="1.0.0.1" />
         <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.5" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.13" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
