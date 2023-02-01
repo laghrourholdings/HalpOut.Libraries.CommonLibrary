@@ -13,9 +13,9 @@ using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace CommonLibrary.AspNetCore.Identity;
 
-public interface ISecuromanService
+public interface ISecuroman
 {
-    Task<Securoman.AuthenticateResult> Authenticate(string token);
+    Task<SecuromanTokenizer.AuthenticateResult> Authenticate(string token);
     //Task<TokenResult?> Authenticate();
     bool IsAuthenticated();
     // Task SetOrUpdateUserAsync(UserBadge badge);
@@ -35,7 +35,7 @@ public interface ISecuromanService
     public string GetSecuromanUrl();
 }
 
-public class SecuromanService : ISecuromanService
+public class Securoman : ISecuroman
 {
     private readonly IConfiguration _config;
     private readonly IDistributedCache _cache;
@@ -50,7 +50,7 @@ public class SecuromanService : ISecuromanService
         //public List<RoleIdentity> RolePrincipal { get; set; }
     }
 
-    public SecuromanService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
+    public Securoman(IConfiguration config, IHttpContextAccessor httpContextAccessor)
     {
         _config = config;
         _httpContextAccessor = httpContextAccessor;
@@ -117,11 +117,11 @@ public class SecuromanService : ISecuromanService
         => _httpContextAccessor.HttpContext?.User.Identity != null 
            && _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 
-    public async Task<Securoman.AuthenticateResult> Authenticate(string token)
+    public async Task<SecuromanTokenizer.AuthenticateResult> Authenticate(string token)
     {
-        var payload = Securoman.GetUnverifiedUserClaims(token);
+        var payload = SecuromanTokenizer.GetUnverifiedUserClaims(token);
         var userId = payload?.FirstOrDefault(x => x.Type == UserClaimTypes.Id)?.Value;
-        if (userId == null) return new Securoman.AuthenticateResult("UserId is null");
+        if (userId == null) return new SecuromanTokenizer.AuthenticateResult("UserId is null");
         var userBadge = await GetUser(new Guid(userId));
         if (userBadge == null)
         {
@@ -137,7 +137,7 @@ public class SecuromanService : ISecuromanService
                         .AppendPathSegment("refreshToken")
                         .GetStringAsync();
                     if(token==null)
-                        return new Securoman.AuthenticateResult("Unauthorized", false);
+                        return new SecuromanTokenizer.AuthenticateResult("Unauthorized", false);
                     _httpContextAccessor.HttpContext.Response.Cookies.Append(SecuromanDefaults.TokenCookie, token,
                          new CookieOptions
                         {
@@ -146,29 +146,29 @@ public class SecuromanService : ISecuromanService
                         });
                 }catch (FlurlHttpException ex)
                 {
-                    return new Securoman.AuthenticateResult(ex.Message, false);
+                    return new SecuromanTokenizer.AuthenticateResult(ex.Message, false);
                 }*/
                 var userBadgerRequest = _securomanUrl
                     .WithCookies(_httpContextAccessor.HttpContext?.Request.Cookies)
                     .AppendPathSegment("api/v1/user")
                     .AppendPathSegment("refreshBadge");
                 var updatedUserBadge = await userBadgerRequest.GetJsonAsync<UserBadge>();
-                if (updatedUserBadge == null) return new Securoman.AuthenticateResult("Failed to grab user badge");
+                if (updatedUserBadge == null) return new SecuromanTokenizer.AuthenticateResult("Failed to grab user badge");
                 await SetOrUpdateUserAsync(updatedUserBadge);
                 userBadge = updatedUserBadge;
             }
             catch (FlurlHttpException ex)
             {
-                return new Securoman.AuthenticateResult(ex.Message);
+                return new SecuromanTokenizer.AuthenticateResult(ex.Message);
             }
         }
 
-        var verify = Securoman.VerifyTokenWithSecret(token, userBadge.SecretKey);
+        var verify = SecuromanTokenizer.VerifyTokenWithSecret(token, userBadge.SecretKey);
         if (verify.Result.IsValid)
-            return new Securoman.AuthenticateResult(/*userBadge.RolePrincipal,*/
+            return new SecuromanTokenizer.AuthenticateResult(/*userBadge.RolePrincipal,*/
                 verify.Claims.Select(x => new Claim(x.Type, x.Value)));
         if (!verify.HasInvalidSecretKey)
-            return new Securoman.AuthenticateResult(verify.Result.Exception.Message);
+            return new SecuromanTokenizer.AuthenticateResult(verify.Result.Exception.Message);
         await RemoveUserAsync(new Guid(userId));
         return await Authenticate(token);
     }

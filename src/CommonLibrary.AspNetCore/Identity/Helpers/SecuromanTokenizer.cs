@@ -9,7 +9,7 @@ using Paseto.Cryptography.Key;
 
 namespace CommonLibrary.AspNetCore.Identity;
 
-public static class Securoman
+public static class SecuromanTokenizer
 {
     public class AuthenticateResult
     {

@@ -5,17 +5,17 @@ namespace CommonLibrary.AspNetCore.Identity.Consumers;
 public class UserInvalidatedConsumer : IConsumer<InvalidateUser>
 {
     
-    private readonly ISecuromanService _securomanService;
+    private readonly ISecuroman _securoman;
 
     public UserInvalidatedConsumer(
-        ISecuromanService securomanService)
+        ISecuroman securoman)
     {
-        _securomanService = securomanService;
+        _securoman = securoman;
     }
 
     
     public Task Consume(ConsumeContext<InvalidateUser> context)
     {
-        return _securomanService.RemoveUserAsync(context.Message.UserId);
+        return _securoman.RemoveUserAsync(context.Message.UserId);
     }
 }

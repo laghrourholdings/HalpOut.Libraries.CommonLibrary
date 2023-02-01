@@ -3,9 +3,9 @@ using System.Text.Json;
 using CommonLibrary.Identity.Models;
 using CommonLibrary.Identity.Models.Dtos;
 
-namespace CommonLibrary.ClientServices.Identity.Helpers;
+namespace CommonLibrary.ClientServices.Identity;
 
-public static class Securoman
+public static class SecuromanTokenizer
 {
     public static IEnumerable<UserClaim>? GetUserClaims(string token)
     {

@@ -11,7 +11,7 @@ namespace CommonLibrary.AspNetCore.Identity.Authentication;
 
 public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAuthenticationOptions>
     {
-        private readonly ISecuromanService _securomanService;
+        private readonly ISecuroman _securoman;
         public const  string SchemaName = "Securoman";
 
         public SecuromanAuthenticationHandler(
@@ -19,10 +19,10 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
             ILoggerFactory logger,
             UrlEncoder encoder,
             ISystemClock clock,
-            ISecuromanService securomanService)
+            ISecuroman securoman)
             : base(options, logger, encoder, clock)
         {
-            _securomanService = securomanService;
+            _securoman = securoman;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -41,12 +41,12 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
             }
             try
             {
-                var result = await _securomanService.Authenticate(token);
+                var result = await _securoman.Authenticate(token);
                 if (!result.Succeeded)
                 {
                     /*if(!result.RefreshToken)
                         return AuthenticateResult.Fail(result.ErrorMessage);*/
-                    var refreshedToken = await _securomanService.GetSecuromanUrl()
+                    var refreshedToken = await _securoman.GetSecuromanUrl()
                         .WithHeader("User-Agent", Request.Headers.UserAgent)
                         .WithCookies(Request.Cookies)
                         .AppendPathSegment("api/v1/user")
@@ -54,7 +54,7 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
                         .GetStringAsync();
                     if(refreshedToken==null)
                         return AuthenticateResult.Fail("Unauthorized - invalid token");
-                    var secondResult = await _securomanService.Authenticate(refreshedToken);
+                    var secondResult = await _securoman.Authenticate(refreshedToken);
                     if(!secondResult.Succeeded) 
                         return AuthenticateResult.Fail(secondResult.ErrorMessage);
                     result = secondResult;

@@ -1,7 +1,7 @@
 ﻿using Paseto;
 using Paseto.Builder;
 
-namespace CommonLibrary.ClientServices.Identity.Helpers;
+namespace CommonLibrary.ClientServices.Identity;
 
 public static class Pasetoman
 {

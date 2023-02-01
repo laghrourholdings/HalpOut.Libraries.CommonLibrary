@@ -8,6 +8,7 @@ using CommonLibrary.AspNetCore.Identity.Policies;
 using CommonLibrary.AspNetCore.Logging;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
@@ -166,7 +167,8 @@ public static class StartupExtentions
         this IServiceCollection services,
         IPolicy[]? additionnalPolicies = null) 
     {
-        services.AddSingleton<ISecuromanService, SecuromanService>();
+        services.AddSingleton<IAuthorizationMiddlewareResultHandler, UserAuthorizationMiddlewareResultHandler>();
+        services.AddSingleton<ISecuroman, Securoman>();
         services.AddScoped<AuthenticationHandler<SecuromanAuthenticationOptions>,SecuromanAuthenticationHandler>();
         services.AddAuthentication(SecuromanAuthenticationHandler.SchemaName)
             .AddScheme<SecuromanAuthenticationOptions, SecuromanAuthenticationHandler>(SecuromanAuthenticationHandler.SchemaName, null);
