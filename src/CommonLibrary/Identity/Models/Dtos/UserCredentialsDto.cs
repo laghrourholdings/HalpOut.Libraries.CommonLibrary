@@ -1,4 +1,4 @@
-﻿namespace CommonLibrary.Identity.Models.Dtos;
+﻿namespace CommonLibrary.Identity.Dtos;
 
 public class UserCredentialsDto
 {

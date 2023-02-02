@@ -1,4 +1,4 @@
-using CommonLibrary.Identity.Models;
+using CommonLibrary.Identity;
 using Microsoft.AspNetCore.Authorization;
 
 namespace CommonLibrary.AspNetCore.Identity.Policies;

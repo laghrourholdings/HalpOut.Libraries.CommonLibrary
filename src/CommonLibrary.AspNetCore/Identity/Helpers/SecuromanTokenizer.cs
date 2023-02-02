@@ -2,8 +2,8 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using CommonLibrary.Identity.Models;
-using CommonLibrary.Identity.Models.Dtos;
+using CommonLibrary.Identity;
+using CommonLibrary.Identity.Dtos;
 using Paseto;
 using Paseto.Cryptography.Key;
 

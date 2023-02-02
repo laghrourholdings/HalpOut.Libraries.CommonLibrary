@@ -1,4 +1,4 @@
-﻿namespace CommonLibrary.AspNetCore.Identity;
+﻿namespace CommonLibrary.Identity;
 
 public static class SecuromanDefaults
 {

@@ -1,4 +1,4 @@
-﻿namespace CommonLibrary.Core.Dtos;
+﻿namespace CommonLibrary.Core;
 
 public class ErrorResponse
 {

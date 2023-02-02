@@ -41,6 +41,7 @@
 
     <ItemGroup>
       <Folder Include="Core\Extentions" />
+      <Folder Include="Core\Settings" />
       <Folder Include="Identity\Helpers" />
       <Folder Include="Logging\Extentions" />
     </ItemGroup>

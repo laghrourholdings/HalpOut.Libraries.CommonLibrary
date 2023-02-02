@@ -1,5 +1,5 @@
 ﻿using CommonLibrary.Core;
-using CommonLibrary.Identity.Models.Dtos;
+using CommonLibrary.Identity.Dtos;
 
 namespace CommonLibrary.ClientServices.Identity;
 

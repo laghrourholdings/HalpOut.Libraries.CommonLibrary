@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Security.Principal;
 using System.Text.Encodings.Web;
+using CommonLibrary.Identity;
 using Flurl.Http;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -49,7 +50,7 @@ public class SecuromanAuthenticationHandler : AuthenticationHandler<SecuromanAut
                     var refreshedToken = await _securoman.GetSecuromanUrl()
                         .WithHeader("User-Agent", Request.Headers.UserAgent)
                         .WithCookies(Request.Cookies)
-                        .AppendPathSegment("api/v1/user")
+                        .AppendPathSegment("api/v1/token")
                         .AppendPathSegment("refreshToken")
                         .GetStringAsync();
                     if(refreshedToken==null)

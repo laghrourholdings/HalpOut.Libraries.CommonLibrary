@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using CommonLibrary.ClientServices.Core;
 using CommonLibrary.Core;
 using CommonLibrary.Logging.Models.Dtos;
 using Flurl;
@@ -10,7 +11,7 @@ public class LogHandleRepository : IRepository<LogHandleDto>
 {
     public async Task<List<LogHandleDto>?> GetAllAsync()
     {
-        return await ServicesSettings.GatewayServiceDevURL
+        return await Api.GatewayService
             .AppendPathSegment("admin/logs")
             .GetJsonAsync<List<LogHandleDto>>();
     }

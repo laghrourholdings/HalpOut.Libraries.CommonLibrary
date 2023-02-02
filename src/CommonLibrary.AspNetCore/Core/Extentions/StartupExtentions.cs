@@ -84,7 +84,7 @@ public static class StartupExtentions
             options.AddPolicy(name: originName,
                 policy  =>
                 {
-                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                    policy.SetIsOriginAllowed(origin=>true).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                 });
         });
         services.AddHttpClient("HttpClient").AddPolicyHandler(

@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using CommonLibrary.AspNetCore.Core;
-using CommonLibrary.Identity.Models;
+using CommonLibrary.Identity;
 using Flurl.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
@@ -133,7 +133,7 @@ public class Securoman : ISecuroman
                     token = await GetSecuromanUrl()
                         .WithHeader("User-Agent", _httpContextAccessor.HttpContext.Request.Headers.UserAgent)
                         .WithCookies(_httpContextAccessor.HttpContext.Request.Cookies)
-                        .AppendPathSegment("api/v1/auth")
+                        .AppendPathSegment("api/v1/token")
                         .AppendPathSegment("refreshToken")
                         .GetStringAsync();
                     if(token==null)
@@ -150,7 +150,7 @@ public class Securoman : ISecuroman
                 }*/
                 var userBadgerRequest = _securomanUrl
                     .WithCookies(_httpContextAccessor.HttpContext?.Request.Cookies)
-                    .AppendPathSegment("api/v1/user")
+                    .AppendPathSegment("api/v1/token")
                     .AppendPathSegment("refreshBadge");
                 var updatedUserBadge = await userBadgerRequest.GetJsonAsync<UserBadge>();
                 if (updatedUserBadge == null) return new SecuromanTokenizer.AuthenticateResult("Failed to grab user badge");

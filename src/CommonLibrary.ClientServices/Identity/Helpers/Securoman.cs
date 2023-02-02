@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
-using CommonLibrary.Identity.Models;
-using CommonLibrary.Identity.Models.Dtos;
+using CommonLibrary.Identity;
+using CommonLibrary.Identity.Dtos;
 
 namespace CommonLibrary.ClientServices.Identity;
 

@@ -43,6 +43,7 @@
     </ItemGroup>
     
     <ItemGroup>
+      <Folder Include="Identity\Settings" />
       <Folder Include="Logging\Enrichers" />
       <Folder Include="Logging\Interfaces" />
     </ItemGroup>
