@@ -1,4 +1,4 @@
-﻿using CommonLibrary.ClientServices.Identity.Handler;
+﻿using CommonLibrary.ClientServices.Core;
 using CommonLibrary.Identity;
 using CommonLibrary.Identity.Dtos;
 using Flurl.Http;
@@ -17,12 +17,12 @@ public interface ISecuroman
 public class Securoman : ISecuroman
 {
     private readonly IFlurlClient _httpClient;
-    private readonly ICookie _cookie;
+    private readonly ICookies _cookies;
 
-    public Securoman(HttpClient httpClient, ICookie cookie)
+    public Securoman(HttpClient httpClient, ICookies cookies)
     {
         _httpClient = new FlurlClient(httpClient);
-        _cookie = cookie;
+        _cookies = cookies;
     }
     
     public async Task<User?> SignInWithUsername(string username, string password)
@@ -37,7 +37,7 @@ public class Securoman : ISecuroman
         {
             var loginResult = await  _httpClient.Request("user/login")
                 .PostJsonAsync(postData);
-            var tokenCookie =  await _cookie.GetValue(SecuromanDefaults.TokenCookie);
+            var tokenCookie =  await _cookies.GetValue(SecuromanDefaults.TokenCookie);
             Console.WriteLine($"tokenCookie: ${tokenCookie}");
             if(string.IsNullOrEmpty(tokenCookie))
                 return null;

@@ -11,8 +11,8 @@ public class LogHandleRepository : IRepository<LogHandleDto>
 {
     public async Task<List<LogHandleDto>?> GetAllAsync()
     {
-        return await Api.GatewayService
-            .AppendPathSegment("admin/logs")
+        return await Api.LogService
+            .AppendPathSegment("logs/handles")
             .GetJsonAsync<List<LogHandleDto>>();
     }
 

@@ -1,6 +1,6 @@
 ﻿using CommonLibrary.Core;
 
-namespace CommonLibrary.ClientServices.Core.Repositories;
+namespace CommonLibrary.ClientServices.Core;
 
 public interface IObjectRepository<T> : IRepository<T> where T:IBusinessObject
 {
